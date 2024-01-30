@@ -1,0 +1,9 @@
+# ENV
+.venv
+.envrc
+
+# Cache
+__pycache__
+
+# Pyenv
+.python-version
