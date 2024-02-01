@@ -4,8 +4,9 @@ import os
 import random
 import webbrowser
 from datetime import datetime
-from os.path import exists
+from functools import partial
 from pathlib import Path
+from threading import Timer
 from typing import NamedTuple, Optional
 
 import fire
@@ -71,21 +72,56 @@ def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
 
     with CACHE_FILE.open("w", encoding="utf-8") as file:
         container = {"date": datetime.now().isoformat(), "data": tuple(data)}
-        file.write(json.dumps(container))
+        json.dump(container, file)
 
     return data
 
 
-def item_selection(starred_items: set[StarredItem], total: int) -> None:
-    # if SELECTION_CACHE.exists():
-    #     with SELECTION_CACHE.open("r", encoding="utf-8") as file:
-    #         selection_file = json.load(file)
+def item_selection(
+    starred_items: set[StarredItem], total: int, max_history: int = 100
+) -> None:
+    if SELECTION_CACHE.exists():
+        with SELECTION_CACHE.open("r", encoding="utf-8") as file:
+            selections = json.load(file)
+    else:
+        selections = []
 
-    item = random.sample(tuple(starred_items), total)
+    for item in selections:
+        if item not in starred_items:
+            continue
+        starred_items.remove(item)
 
-    for star in item:
-        star = StarredItem(*star)
-        print(star)
+    items = random.sample(tuple(starred_items), total)
+
+    print("Which item would you like to select today?")
+    while True:
+        for i, star in enumerate(items, start=1):
+            if not isinstance(star, StarredItem):
+                star = StarredItem(*star)
+
+            print(f"{i}. {star.name}")
+
+        try:
+            selection = int(input("> "))
+            if selection - 1 in range(total):
+                break
+        except ValueError:
+            pass
+
+        print(f"Select an item within the range of 1 and {total}")
+
+    selected_item = StarredItem(*items[selection - 1])
+
+    log.info("Opening %s", selected_item.url)
+
+    Timer(1, partial(webbrowser.get().open, selected_item.url)).start()
+
+    selections.insert(0, selected_item)
+    if len(selections) > max_history:
+        selections.pop()
+
+    with SELECTION_CACHE.open("w", encoding="utf-8") as file:
+        json.dump(selections, file)
 
 
 def main(account: Optional[str] = None, total: int = 3, refresh: bool = False) -> None:
