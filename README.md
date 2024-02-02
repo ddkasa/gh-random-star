@@ -14,17 +14,17 @@ $ poetry install
 ```
 
 ```
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 2. Setup GitHub API token as the `GITHUB_ACCESS_TOKEN` environment variable.
-3. Run the script through `python github_random_star/main.py`.
+3. Run the script through `python github_random_star/main.py <flags>` or if using poetry `poetry run cli <flags>`
 
 ## Flags
 
-- Account: Name of the account to retrieve the starred items from.
-- Total: Total amount of random items to pick.
-- Refresh: Whether to fetch new cached data or not.
+- `-a, --account` Name of the account to retrieve the starred items from.
+- `-t, --total` Total amount of random items to pick.
+- `-r, --refresh` Whether to fetch new cached data or not.
 
 # License
 
