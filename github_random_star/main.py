@@ -18,7 +18,7 @@ CACHE_PATH = Path("cache")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = CACHE_PATH / Path("cache.json")
 
-SELECTION_CACHE = CACHE_PATH / Path("selections.cache")
+SELECTION_CACHE = CACHE_PATH / Path("selections.json")
 
 
 class StarredItem(NamedTuple):
