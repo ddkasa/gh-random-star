@@ -5,6 +5,9 @@ description = ""
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+cli = "github_random_star:main"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 httpx = "^0.26.0"
