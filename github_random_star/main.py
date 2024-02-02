@@ -36,7 +36,10 @@ def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
                 "Cache last refreshed on the %s.",
                 datetime.fromisoformat(file["date"]).date().isoformat(),
             )
-            return file["data"]
+            if file.get("account") == account:
+                return file["data"]
+
+            log.warning("Cache is storing a different account.")
 
     log.info("Requesting data from Github")
 
@@ -71,7 +74,11 @@ def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
         page += 1
 
     with CACHE_FILE.open("w", encoding="utf-8") as file:
-        container = {"date": datetime.now().isoformat(), "data": tuple(data)}
+        container = {
+            "account": account,
+            "date": datetime.now().isoformat(),
+            "data": tuple(data),
+        }
         json.dump(container, file)
 
     return data
