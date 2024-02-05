@@ -125,13 +125,18 @@ def item_selection(
 
     selections.insert(0, selected_item)
     if len(selections) > max_history:
-        selections.pop()
+        selections = selections[: -(len(selections) - max_history)]
 
     with SELECTION_CACHE.open("w", encoding="utf-8") as file:
         json.dump(selections, file)
 
 
-def main(account: Optional[str] = None, total: int = 3, refresh: bool = False) -> None:
+def main(
+    account: Optional[str] = None,
+    total: int = 3,
+    refresh: bool = False,
+    max_history: int = 100,
+) -> None:
     log.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=log.INFO,
@@ -148,7 +153,7 @@ def main(account: Optional[str] = None, total: int = 3, refresh: bool = False) -
 
     log.info("Total amount of starred items: %s", len(starred_items))
 
-    item_selection(starred_items, total)
+    item_selection(starred_items, total, max_history)
 
 
 if __name__ == "__main__":
