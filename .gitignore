@@ -8,3 +8,6 @@ cache
 
 # Pyenv
 .python-version
+
+# distribution /packaging
+dist
