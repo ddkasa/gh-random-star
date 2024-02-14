@@ -14,7 +14,9 @@ import httpx
 
 USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
-CACHE_PATH = Path("cache")
+
+# TODO: Need a Windows solution here.
+CACHE_PATH = Path.home() / Path(".cache/github_random_star/")
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = CACHE_PATH / Path("cache.json")
 
