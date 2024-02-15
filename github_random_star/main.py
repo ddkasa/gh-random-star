@@ -23,6 +23,10 @@ CACHE_FILE = CACHE_PATH / Path("cache.json")
 SELECTION_CACHE = CACHE_PATH / Path("selections.json")
 
 
+class AccountMissingError(TypeError):
+    "Target GitHub account was not provided through flags or an environment variable."
+
+
 class StarredItem(NamedTuple):
     repo_id: int
     name: str
@@ -147,10 +151,7 @@ def main(
     if account is None:
         account = os.environ.get("GITHUB_ACCOUNT")
         if account is None:
-            raise ValueError(
-                "Account not provided from arguments or environment variables."
-            )
-
+            raise AccountMissingError()
     starred_items = retrieve_cache(account, refresh)
 
     log.info("Total amount of starred items: %s", len(starred_items))
