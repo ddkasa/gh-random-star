@@ -1,4 +1,4 @@
-# GitHub Random Star
+# ⭐️ GitHub Random Star ⭐️
 
 # Idea
 
@@ -16,18 +16,21 @@ Install through [Pipx](https://github.com/pypa/pipx) from PyPi.
 
 Either install from [pypi](https://pypi.org/project/github-random-star) with `pip` or clone this repository and install requirements through [poetry](pyproject.toml) or the provided [requirements](requirements.txt) file.
 
-```
-# If using poetry.
-$ poetry shell
-$ poetry install
-```
-
-```
-# If using requirements
-$ virtualenv -p python3.12 .venv
-$ source .venv/bin/activate
-$ pip install -r requirements.txt
-```
+<details>
+    <summary>If using poetry.</summary>
+    ```
+    $ poetry shell
+    $ poetry install
+    ```
+</details>
+<details>
+    <summary> If using requirements.txt.</summary>
+    ```
+    $ virtualenv -p python3.12 .venv
+    $ source .venv/bin/activate
+    $ pip install -r requirements.txt
+    ```
+</details>
 
 # Usage
 
