@@ -18,18 +18,18 @@ Either install from [pypi](https://pypi.org/project/github-random-star) with `pi
 
 <details>
     <summary>If using poetry.</summary>
-    ```
-    $ poetry shell
+    <code>
+    $ poetry shell<br>
     $ poetry install
-    ```
+    </code>
 </details>
 <details>
     <summary> If using requirements.txt.</summary>
-    ```
-    $ virtualenv -p python3.12 .venv
-    $ source .venv/bin/activate
+    <code>
+    $ virtualenv -p python3.12 .venv<br>
+    $ source .venv/bin/activate<br>
     $ pip install -r requirements.txt
-    ```
+    </code>
 </details>
 
 # Usage
@@ -43,6 +43,13 @@ Either install from [pypi](https://pypi.org/project/github-random-star) with `pi
 - `-t, --total` Total amount of random items to pick from. Defaults to 3.
 - `-r, --refresh` Whether to fetch new cached data or not. Will refetch all starred items.
 - `-m, --max-history` The amount of historic choices to cache. Defaults to 100.
+- `-i, --ignore` If to use a list of repositories to ignore. Defaults to true.
+
+## Examples
+
+- `gh-star -a <username>`
+- `gh-star -a <username> -t 5`
+- `gh-star -a <username> -r -t 5`
 
 # License
 
