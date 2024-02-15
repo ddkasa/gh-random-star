@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "github-random-star"
-version = "0.0.2"
+version = "0.0.3"
 description = "Simple CLI tool to fetch a random starred items from a users GitHub profile."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 readme = "README.md"
