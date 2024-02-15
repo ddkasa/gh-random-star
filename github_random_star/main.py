@@ -14,9 +14,14 @@ import httpx
 
 USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
+if os.name != "nt":
+    CACHE_PATH = Path.home() / Path(".cache")
+else:
+    CACHE_PATH = os.getenv("APPDATA")
 
-# TODO: Need a Windows solution here.
-CACHE_PATH = Path.home() / Path(".cache/github_random_star/")
+CACHE_PATH = CACHE_PATH / Path("github_random_star/")
+
+
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = CACHE_PATH / Path("cache.json")
 
@@ -152,6 +157,7 @@ def main(
         account = os.environ.get("GITHUB_ACCOUNT")
         if account is None:
             raise AccountMissingError()
+
     starred_items = retrieve_cache(account, refresh)
 
     log.info("Total amount of starred items: %s", len(starred_items))
