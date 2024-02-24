@@ -118,14 +118,16 @@ def item_selection(
     starred_items: set[StarredItem],
     total: int,
     max_history: int = 100,
+    ignore: bool = True,
 ) -> None:
     selections = extract_selection(SELECTION_CACHE)
 
     starred_items = starred_items - starred_items.intersection(selections)
 
     if IGNORE_FILE.exists():
-        ignore_list = extract_selection(IGNORE_FILE)
-        starred_items = starred_items - starred_items.intersection(ignore_list)
+        if ignore:
+            ignore_list = extract_selection(IGNORE_FILE)
+            starred_items = starred_items - starred_items.intersection(ignore_list)
     else:
         with IGNORE_FILE.open("w", encoding="utf-8") as file:
             json.dump([], file)
@@ -170,6 +172,7 @@ def main(
     total: int = 3,
     refresh: bool = False,
     max_history: int = 100,
+    ignore: bool = True,
 ) -> None:
     log.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -185,7 +188,7 @@ def main(
 
     log.info("Total amount of starred items: %s", len(starred_items))
 
-    item_selection(starred_items, total, max_history)
+    item_selection(starred_items, total, max_history, ignore)
 
     log.info("Done!")
 
