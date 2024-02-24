@@ -8,16 +8,21 @@ from functools import partial
 from pathlib import Path
 from threading import Timer
 from typing import NamedTuple, Optional
+import atexit
 
-import fire
-import httpx
+import fire  # type: ignore [import-not-found]
+import httpx  # type: ignore [import-not-found]
 
 USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
 if os.name != "nt":
     CACHE_PATH = Path.home() / Path(".cache")
 else:
-    CACHE_PATH = os.getenv("APPDATA")
+    env = os.getenv("APPDATA")
+    if isinstance(env, str):
+        CACHE_PATH = Path(env)
+    else:
+        CACHE_PATH = Path.home()
 
 CACHE_PATH = CACHE_PATH / Path("github_random_star/")
 
@@ -27,9 +32,11 @@ CACHE_FILE = CACHE_PATH / Path("cache.json")
 
 SELECTION_CACHE = CACHE_PATH / Path("selections.json")
 
+IGNORE_FILE = CACHE_PATH / Path("ignore.json")
+
 
 class AccountMissingError(TypeError):
-    "Target GitHub account was not provided through flags or an environment variable."
+    "GitHub account was not provided through flags or an environment variable."
 
 
 class StarredItem(NamedTuple):
@@ -41,16 +48,17 @@ class StarredItem(NamedTuple):
 def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
     if CACHE_FILE.exists() and not refresh:
         with CACHE_FILE.open("r", encoding="utf-8") as file:
-            file = json.load(file)
+            cache_data = json.load(file)
 
-            log.info(
-                "Cache last refreshed on the %s.",
-                datetime.fromisoformat(file["date"]).date().isoformat(),
-            )
-            if file.get("account") == account:
-                return file["data"]
+        log.info(
+            "Cache last refreshed on the %s.",
+            datetime.fromisoformat(cache_data["date"]).date().isoformat(),
+        )
+        if cache_data.get("account") == account:
+            cache_data = {StarredItem(*item) for item in cache_data["data"]}
+            return cache_data
 
-            log.warning("Cache is storing a different account.")
+        log.warning("Cache is storing a different account.")
 
     log.info("Requesting data from Github")
 
@@ -95,19 +103,32 @@ def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
     return data
 
 
-def item_selection(
-    starred_items: set[StarredItem], total: int, max_history: int = 100
-) -> None:
-    if SELECTION_CACHE.exists():
-        with SELECTION_CACHE.open("r", encoding="utf-8") as file:
+def extract_selection(path: Path) -> list[StarredItem]:
+    data = []
+    if path.exists():
+        with path.open("r", encoding="utf-8") as file:
             selections = json.load(file)
-    else:
-        selections = []
 
-    for item in selections:
-        if item not in starred_items:
-            continue
-        starred_items.remove(item)
+        data = [StarredItem(*item) for item in selections]
+
+    return data
+
+
+def item_selection(
+    starred_items: set[StarredItem],
+    total: int,
+    max_history: int = 100,
+) -> None:
+    selections = extract_selection(SELECTION_CACHE)
+
+    starred_items = starred_items - starred_items.intersection(selections)
+
+    if IGNORE_FILE.exists():
+        ignore_list = extract_selection(IGNORE_FILE)
+        starred_items = starred_items - starred_items.intersection(ignore_list)
+    else:
+        with IGNORE_FILE.open("w", encoding="utf-8") as file:
+            json.dump([], file)
 
     items = random.sample(tuple(starred_items), total)
 
@@ -132,7 +153,9 @@ def item_selection(
 
     log.info("Opening %s", selected_item.url)
 
-    Timer(1, partial(webbrowser.get().open, selected_item.url)).start()
+    t = Timer(1, partial(webbrowser.get().open, selected_item.url))
+    atexit.register(t.cancel)
+    t.start()
 
     selections.insert(0, selected_item)
     if len(selections) > max_history:
@@ -163,6 +186,8 @@ def main(
     log.info("Total amount of starred items: %s", len(starred_items))
 
     item_selection(starred_items, total, max_history)
+
+    log.info("Done!")
 
 
 if __name__ == "__main__":
