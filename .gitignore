@@ -5,6 +5,7 @@
 # Cache
 __pycache__
 cache
+__mypycache__
 
 # Pyenv
 .python-version
