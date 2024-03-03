@@ -26,7 +26,6 @@ else:
 
 CACHE_PATH = CACHE_PATH / Path("github_random_star/")
 
-
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
 CACHE_FILE = CACHE_PATH / Path("cache.json")
 
@@ -45,7 +44,19 @@ class StarredItem(NamedTuple):
     url: str
 
 
-def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
+def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
+    """Retrieves data for choosing a random starred item from GitHub.
+
+    Args:
+        account: Github account the starred items will be retrieved from.
+        refresh: Weither or not to refresh the cache. Defaults to False.
+
+    Raises:
+        ConnectionError: If the outgoing request was not successful.
+
+    Returns:
+        set(StarredItem): Set of starred items from GitHub.
+    """
     if CACHE_FILE.exists() and not refresh:
         with CACHE_FILE.open("r", encoding="utf-8") as file:
             cache_data = json.load(file)
@@ -104,6 +115,15 @@ def retrieve_cache(account: str, refresh: bool) -> set[StarredItem]:
 
 
 def extract_selection(path: Path) -> list[StarredItem]:
+    """Extracts selections from a JSON file.
+
+    Args:
+        path: Path to the JSON file.
+
+    Returns:
+        list(StarredItem): List of starred items from the JSON file. Needs to
+            stay a list in order to preserve order when keeping history.
+    """
     data = []
     if path.exists():
         with path.open("r", encoding="utf-8") as file:
@@ -120,6 +140,15 @@ def item_selection(
     max_history: int = 100,
     ignore: bool = True,
 ) -> None:
+    """Selection function where the user chooses a random starred item.
+
+    Args:
+        starred_items: Set of starred items from GitHub.
+        total: Total of choices the user can pick from.
+        max_history: Maximum amount of items to keep in history.
+        ignore: Whether or not to ignore previously selected items.
+            Defaults to True.
+    """
     selections = extract_selection(SELECTION_CACHE)
 
     starred_items = starred_items - starred_items.intersection(selections)
@@ -174,6 +203,12 @@ def main(
     max_history: int = 100,
     ignore: bool = True,
 ) -> None:
+    """Basic entrypoint for the CLI script.
+
+    Raises:
+        AccountMissingError: If the GitHub account was not provided through
+            flags or an environment variables.
+    """
     log.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=log.INFO,
