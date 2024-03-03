@@ -18,18 +18,14 @@ Either install from [pypi](https://pypi.org/project/github-random-star) with `pi
 
 <details>
     <summary>If using poetry.</summary>
-    <code>
-    $ poetry shell<br>
-    $ poetry install
-    </code>
+    <code>$ poetry shell</code><br>
+    <code>$ poetry install</code>
 </details>
 <details>
     <summary> If using requirements.txt.</summary>
-    <code>
-    $ virtualenv -p python3.12 .venv<br>
-    $ source .venv/bin/activate<br>
-    $ pip install -r requirements.txt
-    </code>
+    <code>$ virtualenv -p python3.12 .venv</code><br>
+    <code>$ source .venv/bin/activate</code><br>
+    <code>$ pip install -r requirements.txt</code>
 </details>
 
 # Usage
@@ -39,10 +35,10 @@ Either install from [pypi](https://pypi.org/project/github-random-star) with `pi
 
 ## Flags
 
-- `-a, --account` Username of the github account to retrieve the starred items from. `--account` is required or `GITHUB_ACCOUNT` environment variable needs to be set.
+- `-a, --account` Username of the github account to retrieve the starred items from. `--account` is required or `GH_STAR_ACCOUNT` environment variable needs to be set.
 - `-t, --total` Total amount of random items to pick from. Defaults to 3.
 - `-r, --refresh` Whether to fetch new cached data or not. Will refetch all starred items.
-- `-m, --max-history` The amount of historic choices to cache. Defaults to 100.
+- `-m, --max-history` The amount of historic choices to cache. Defaults to 100. Set to -1 to keep history unlimited. `GH_STAR_MAX_HISTORY` environment variable can be used to override this value.
 - `-i, --ignore` If to use a list of repositories to ignore. Defaults to true.
 
 ## Examples

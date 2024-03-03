@@ -146,12 +146,15 @@ def item_selection(
         starred_items: Set of starred items from GitHub.
         total: Total of choices the user can pick from.
         max_history: Maximum amount of items to keep in history.
+            Defaults to 100. Set to 0 to disable history or -1 to keep all.
         ignore: Whether or not to ignore previously selected items.
             Defaults to True.
     """
-    selections = extract_selection(SELECTION_CACHE)
+    og_len = len(starred_items)
 
-    starred_items = starred_items - starred_items.intersection(selections)
+    if max_history != -1:
+        selections = extract_selection(SELECTION_CACHE)
+        starred_items = starred_items - starred_items.intersection(selections)
 
     if IGNORE_FILE.exists():
         if ignore:
@@ -189,8 +192,11 @@ def item_selection(
     t.start()
 
     selections.insert(0, selected_item)
-    if len(selections) > max_history:
+    if len(selections) > max_history and max_history > 0:
         selections = selections[: -(len(selections) - max_history)]
+
+    if og_len == len(starred_items) and max_history == -1:
+        selections = []
 
     with SELECTION_CACHE.open("w", encoding="utf-8") as file:
         json.dump(selections, file)
@@ -200,7 +206,7 @@ def main(
     account: Optional[str] = None,
     total: int = 3,
     refresh: bool = False,
-    max_history: int = 100,
+    max_history: Optional[int] = None,
     ignore: bool = True,
 ) -> None:
     """Basic entrypoint for the CLI script.
@@ -215,9 +221,12 @@ def main(
     )
 
     if account is None:
-        account = os.environ.get("GITHUB_ACCOUNT")
+        account = os.environ.get("GH_STAR_ACCOUNT")
         if account is None:
             raise AccountMissingError()
+
+    if max_history is None:
+        max_history = int(os.environ.get("GH_STAR_MAX_HISTORY", 100))
 
     starred_items = retrieve_cache(account, refresh)
 
