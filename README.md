@@ -1,5 +1,8 @@
 # ⭐️ GitHub Random Star ⭐️
 
+<a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/v/github_random_star?style=for-the-badge&logo=pypi" /></a>
+
+
 # Idea
 
 I generally have starred way too many repository. I wanted to create a simple CLI tool that throws me one random repo I have starred once a day, so I can go back to these repos and explore them more in detail.
@@ -18,11 +21,15 @@ Either install from [pypi](https://pypi.org/project/github-random-star) with `pi
 
 <details>
     <summary>If using poetry.</summary>
+    <code>$ git clone https://github.com/gh-star/github_random_star</code><br>
+    <code>$ cd github_random_star</code><br>
     <code>$ poetry shell</code><br>
     <code>$ poetry install</code>
 </details>
 <details>
     <summary> If using requirements.txt.</summary>
+    <code>$ git clone https://github.com/gh-star/github_random_star</code><br>
+    <code>$ cd github_random_star</code><br>
     <code>$ virtualenv -p python3.12 .venv</code><br>
     <code>$ source .venv/bin/activate</code><br>
     <code>$ pip install -r requirements.txt</code>
