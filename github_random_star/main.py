@@ -2,16 +2,13 @@ import json
 import logging as log
 import os
 import random
-import webbrowser
+import subprocess
 from datetime import datetime
-from functools import partial
 from pathlib import Path
-from threading import Timer
 from typing import NamedTuple, Optional
-import atexit
 
-import fire  # type: ignore [import-not-found]
-import httpx  # type: ignore [import-not-found]
+import fire
+import httpx
 
 USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
@@ -187,9 +184,11 @@ def item_selection(
 
     log.info("Opening %s", selected_item.url)
 
-    t = Timer(1, partial(webbrowser.get().open, selected_item.url))
-    atexit.register(t.cancel)
-    t.start()
+    subprocess.run(
+        ["python", "-m", "webbrowser", "-t", selected_item.url],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
 
     selections.insert(0, selected_item)
     if len(selections) > max_history and max_history > 0:
