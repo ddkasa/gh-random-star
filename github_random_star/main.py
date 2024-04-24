@@ -64,6 +64,7 @@ def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
         )
         if cache_data.get("account") == account:
             cache_data = {StarredItem(*item) for item in cache_data["data"]}
+            # TODO: Multiple cache file for different accounts.
             return cache_data
 
         log.warning("Cache is storing a different account.")
@@ -72,9 +73,13 @@ def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
 
     headers = {"X-GitHub-Api-Version": "2022-11-28"}
     API_TOKEN = os.environ.get("GITHUB_ACCESS_TOKEN")
-    if API_TOKEN is not None:
+    if API_TOKEN:
         log.info("Using provided GitHub API token")
         headers["Authorization"] = f"Bearer {API_TOKEN}"
+    else:
+        log.warning(
+            "No GitHub API token provided. Using public access with a smaller rate limit."
+        )
 
     data = set()
 
@@ -85,10 +90,10 @@ def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
         request = httpx.get(formatted_url, timeout=20, headers=headers)
 
         if request.status_code != 200:
-            raise ConnectionError(
-                "Connection failed to get starred items for {account}.\
-                Status Code: {request.status_code}"
-            )
+            err = "Connection failed to get starred items for %s. \
+                Status Code: %s"
+            log.error(err, account, request.status_code)
+            raise ConnectionError(err % account, request.status_code)
 
         response: list = request.json()
         if not response:
