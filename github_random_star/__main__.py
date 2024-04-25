@@ -130,6 +130,8 @@ def extract_selection(path: Path) -> list[StarredItem]:
     if path.exists():
         with path.open("r", encoding="utf-8") as file:
             selections = json.load(file)
+            if "data" in selections:
+                selections = selections["data"]
 
         data = [StarredItem(*item) for item in selections]
 
@@ -154,8 +156,8 @@ def item_selection(
     """
     og_len = len(starred_items)
 
+    selections = extract_selection(SELECTION_CACHE)
     if max_history != -1:
-        selections = extract_selection(SELECTION_CACHE)
         starred_items = starred_items - starred_items.intersection(selections)
 
     if IGNORE_FILE.exists():
