@@ -41,7 +41,12 @@ class StarredItem(NamedTuple):
     url: str
 
 
-def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
+def retrieve_cache(
+    account: str,
+    *,
+    refresh: bool = False,
+    max_results: Optional[int] = None,
+) -> set[StarredItem]:
     """Retrieves data for choosing a random starred item from GitHub.
 
     Args:
@@ -102,6 +107,11 @@ def retrieve_cache(account: str, refresh: bool = False) -> set[StarredItem]:
         for item in response:
             tp = StarredItem(item["id"], item["full_name"], item["html_url"])
             data.add(tp)
+            if max_results and len(data) >= max_results:
+                break
+
+        if max_results and len(data) >= max_results:
+            break
 
         page += 1
 
@@ -140,6 +150,7 @@ def extract_selection(path: Path) -> list[StarredItem]:
 
 def item_selection(
     starred_items: set[StarredItem],
+    *,
     total: int,
     max_history: int = 100,
     ignore: bool = True,
@@ -214,6 +225,7 @@ def main(
     refresh: bool = False,
     max_history: Optional[int] = None,
     ignore: bool = True,
+    max_results: Optional[int] = None,
 ) -> None:
     """Basic entrypoint for the CLI script.
 
@@ -234,11 +246,20 @@ def main(
     if max_history is None:
         max_history = int(os.environ.get("GH_STAR_MAX_HISTORY", 100))
 
-    starred_items = retrieve_cache(account, refresh)
+    starred_items = retrieve_cache(
+        account,
+        refresh=refresh,
+        max_results=max_results,
+    )
 
     log.info("Total amount of starred items: %s", len(starred_items))
 
-    item_selection(starred_items, total, max_history, ignore)
+    item_selection(
+        starred_items,
+        total=total,
+        max_history=max_history,
+        ignore=ignore,
+    )
 
     log.info("Done!")
 

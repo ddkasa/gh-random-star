@@ -45,8 +45,9 @@ Install from [PyPi](https://pypi.org/project/github-random-star)/[GitHub](https:
 - `-a, --account` Username of the GitHub account to retrieve the starred items from. `--account` is required or `GH_STAR_ACCOUNT` environment variable needs to be set.
 - `-t, --total` Total amount of random items you want to pick from. Defaults to 3.
 - `-r, --refresh` Whether to fetch new cached data or not. Will re fetch all starred items instead of using cache.
-- `-m, --max-history` The amount of historic choices to cache. Defaults to 100. Set to **-1** to keep history unlimited. `GH_STAR_MAX_HISTORY` environment variable can be used to override this value.
+- `--max-history` The amount of historic choices to cache. Defaults to 100. Set to **-1** to keep history unlimited. `GH_STAR_MAX_HISTORY` environment variable can be used to override this value.
 - `-i, --ignore` If to use a list of repositories to ignore. Defaults to true.
+- `--max_results` The amount of starred items to retrieve from GitHub. Defaults to all.
 
 ### Examples
 
