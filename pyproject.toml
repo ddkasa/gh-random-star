@@ -34,7 +34,7 @@ keywords = [
 "Bug Tracker" = "https://github.com/ddkasa/github-random-star/issues"
 
 [tool.poetry.scripts]
-gh-star = "github_random_star:main"
+gh-star = "github_random_star:gh_star"
 
 
 [tool.poetry.dependencies]

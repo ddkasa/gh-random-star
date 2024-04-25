@@ -1,9 +1,12 @@
 import fire  # type: ignore[import-not-found]
 
-from . import main as m
+from .__main__ import main
 
 __version__ = "0.0.5"
 
 
-def main(*args, **kwargs) -> None:
-    fire.Fire(m.main, *args, **kwargs)
+def gh_star(*args, **kwargs) -> None:
+    try:
+        fire.Fire(main, *args, **kwargs)
+    except EOFError:
+        print("User exited the program!")
