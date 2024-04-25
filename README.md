@@ -1,6 +1,7 @@
 # ⭐️ GitHub Random Star ⭐️
 
 <a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/v/github_random_star?style=for-the-badge&logo=pypi" /></a>
+<a href=""><img src="https://img.shields.io/github/actions/workflow/status/ddkasa/github-random-star/pypi-publish.yml?style=for-the-badge"/></a>
 <a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/dm/github-random-star?style=for-the-badge" /></a>
 
 ![](docs/example_image.png?raw=true)
@@ -38,7 +39,7 @@ Install from [PyPi](https://pypi.org/project/github-random-star)/[GitHub](https:
 ## Usage
 
 1. Setup GitHub API token as the `GITHUB_ACCESS_TOKEN` environment variable. _If this is not setup it will use the public access point with lower rates._
-2. Run the script through `gh-star <flags>`, `python github_random_star/main.py <flags>` or if using poetry `poetry run gh-star <flags>`
+2. Run the script through `gh-star <flags>`, `python github_random_star/main.py <flags>` or if using Poetry `poetry run gh-star <flags>`
 
 ### Flags
 
@@ -55,6 +56,20 @@ Install from [PyPi](https://pypi.org/project/github-random-star)/[GitHub](https:
 - `gh-star -a ddkasa -t 5`
 - `gh-star -a ddkasa -r -t 5`
 
-## License
+### Development
 
+Development is run through [Poetry](https://github.com/python-poetry/poetry).
+
+#### Basic Setup
+1. `$ git clone https://github.com/ddkasa/github-random-star`
+2. `$ cd github-random-star`
+3. `$ poetry shell`
+4. `$ poetry install`
+
+#### Testing
+- Use `poetry run pytest` for all tests.
+- Use `pytest -m unit` for unit tests.
+- Use `pytest -m integration` for integration tests.
+
+## License
 MIT. Look at the [LICENSE](LICENSE.md) for details.
