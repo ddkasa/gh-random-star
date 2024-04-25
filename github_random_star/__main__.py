@@ -55,6 +55,8 @@ def retrieve_cache(
     Args:
         account: Github account the starred items will be retrieved from.
         refresh: Whether or not to refresh the cache. Defaults to False.
+        max_results: Maximum amount of items to retrieve. If left as None all
+            items will be retrieved.
 
     Raises:
         ConnectionError: If the outgoing request was not successful.
