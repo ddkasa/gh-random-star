@@ -74,7 +74,7 @@ def retrieve_cache(
         )
         if cache_data.get("account") == account:
             cache_data = {StarredItem(*item) for item in cache_data["data"]}
-            # TODO: Multiple cache file for different accounts.
+            # TODO: Multiple cache file for different accounts.repo:ulif/diceware
             return cache_data
 
         log.warning("Cache is storing a different account.")
@@ -177,16 +177,19 @@ def item_selection(
         starred_items = starred_items - starred_items.intersection(selections)
 
     if IGNORE_FILE.exists():
+        ignore_list = []
         if ignore:
             ignore_list = extract_selection(IGNORE_FILE)
             starred_items = starred_items - starred_items.intersection(ignore_list)
     else:
+        ignore_list = []
         with IGNORE_FILE.open("w", encoding="utf-8") as file:
-            json.dump([], file)
+            json.dump(ignore_list, file)
 
     items = random.sample(tuple(starred_items), total)
 
     print("Which item would you like to select today?")
+    print("Note: Add .1 to number to add to ignore list")
     while True:
         for i, star in enumerate(items, start=1):
             if not isinstance(star, StarredItem):
@@ -195,15 +198,16 @@ def item_selection(
             print(f"{i}. {star.name}")
 
         try:
-            selection = int(input("> "))
-            if selection - 1 in range(total):
+            selection = float(input("> "))
+            if int(selection - 1) in range(total):
                 break
         except ValueError:
             pass
 
         print(f"Select an item within the range of 1 and {total}")
 
-    selected_item = StarredItem(*items[selection - 1])
+    # TODO: Add a way of directly adding items to ignore list.
+    selected_item = StarredItem(*items[int(selection - 1)])
 
     log.info("Opening %s", selected_item.url)
 
@@ -212,6 +216,12 @@ def item_selection(
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+
+    if selection % 1 != 0.1:
+        log.info("Adding %s to ignore list", selected_item.name)
+        ignore_list.append(selected_item)
+        with IGNORE_FILE.open("w", encoding="utf-8") as file:
+            json.dump(ignore_list, file)
 
     selections.insert(0, selected_item)
     if len(selections) > max_history and max_history > 0:
