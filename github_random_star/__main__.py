@@ -12,7 +12,10 @@ import httpx
 
 USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
-if os.name != "nt":
+if os.getenv("PYTEST_TESTING"):
+    CACHE_PATH = Path("tests/files")
+
+elif os.name != "nt":
     CACHE_PATH = Path.home() / Path(".cache")
 else:
     env = os.getenv("APPDATA")
@@ -51,7 +54,7 @@ def retrieve_cache(
 
     Args:
         account: Github account the starred items will be retrieved from.
-        refresh: Weither or not to refresh the cache. Defaults to False.
+        refresh: Whether or not to refresh the cache. Defaults to False.
 
     Raises:
         ConnectionError: If the outgoing request was not successful.
