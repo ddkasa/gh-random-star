@@ -28,7 +28,6 @@ else:
 CACHE_PATH = CACHE_PATH / Path("github_random_star/")
 
 CACHE_PATH.mkdir(parents=True, exist_ok=True)
-CACHE_FILE = CACHE_PATH / Path("cache.json")
 
 SELECTION_CACHE = CACHE_PATH / Path("selections.json")
 
@@ -85,9 +84,8 @@ def item_selection(
         starred_items = starred_items - starred_items.intersection(selections)
 
     if IGNORE_FILE.exists():
-        ignore_list = []
+        ignore_list = extract_selection(IGNORE_FILE)
         if ignore:
-            ignore_list = extract_selection(IGNORE_FILE)
             starred_items = starred_items - starred_items.intersection(ignore_list)
     else:
         ignore_list = []
