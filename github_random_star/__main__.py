@@ -2,8 +2,6 @@ import json
 import logging
 import os
 import random
-
-
 import subprocess
 from pathlib import Path
 from typing import Optional
@@ -53,6 +51,7 @@ def item_selection(
 
     Args:
         starred_items: Set of starred items from GitHub.
+        cache_path: Path to the cache directory.
         total: Total of choices the user can pick from.
         max_history: Maximum amount of items to keep in history.
             Defaults to 100. Set to 0 to disable history or -1 to keep all.
@@ -126,6 +125,11 @@ def item_selection(
 
 
 def generate_cache_directory():
+    """Setup for cache directory depending on the OS.
+
+    Returns:
+        Path: Path to the cache directory.
+    """
     if os.getenv("PYTEST_TESTING"):
         CACHE_PATH = Path("tests/files")
 
