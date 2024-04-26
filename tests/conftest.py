@@ -2,7 +2,12 @@ import random
 from pathlib import Path
 
 import pytest
-from github_random_star.__main__ import extract_selection
+from github_random_star.__main__ import extract_selection, generate_cache_directory
+
+
+@pytest.fixture(scope="session")
+def cache_location():
+    return generate_cache_directory()
 
 
 @pytest.fixture(scope="session")
