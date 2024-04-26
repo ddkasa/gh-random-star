@@ -2,36 +2,17 @@ import json
 import logging
 import os
 import random
+
+
 import subprocess
 from pathlib import Path
 from typing import Optional
 
 import fire
 
-from github_random_star.api import StarredItem, GithubAPI
-
+from github_random_star.api import GithubAPI, StarredItem
 
 log = logging.getLogger("GitHub Random Star")
-
-if os.getenv("PYTEST_TESTING"):
-    CACHE_PATH = Path("tests/files")
-
-elif os.name != "nt":
-    CACHE_PATH = Path.home() / Path(".cache")
-else:
-    env = os.getenv("APPDATA")
-    if isinstance(env, str):
-        CACHE_PATH = Path(env)
-    else:
-        CACHE_PATH = Path.home()
-
-CACHE_PATH = CACHE_PATH / Path("github_random_star/")
-
-CACHE_PATH.mkdir(parents=True, exist_ok=True)
-
-SELECTION_CACHE = CACHE_PATH / Path("selections.json")
-
-IGNORE_FILE = CACHE_PATH / Path("ignore.json")
 
 
 class AccountMissingError(TypeError):
@@ -62,6 +43,7 @@ def extract_selection(path: Path) -> list[StarredItem]:
 
 def item_selection(
     starred_items: set[StarredItem],
+    cache_path: Path,
     *,
     total: int,
     max_history: int = 100,
@@ -77,19 +59,22 @@ def item_selection(
         ignore: Whether or not to ignore previously selected items.
             Defaults to True.
     """
+    selection_cache = cache_path / Path("selections.json")
+    ignore_file = cache_path / Path("ignore.json")
+
     og_len = len(starred_items)
 
-    selections = extract_selection(SELECTION_CACHE)
+    selections = extract_selection(selection_cache)
     if max_history != -1:
         starred_items = starred_items - starred_items.intersection(selections)
 
-    if IGNORE_FILE.exists():
-        ignore_list = extract_selection(IGNORE_FILE)
+    if ignore_file.exists():
+        ignore_list = extract_selection(ignore_file)
         if ignore:
             starred_items = starred_items - starred_items.intersection(ignore_list)
     else:
         ignore_list = []
-        with IGNORE_FILE.open("w", encoding="utf-8") as file:
+        with ignore_file.open("w", encoding="utf-8") as file:
             json.dump(ignore_list, file)
 
     items = random.sample(tuple(starred_items), total)
@@ -126,7 +111,7 @@ def item_selection(
     if selection % 1 != 0.1:
         log.info("Adding %s to ignore list", selected_item.name)
         ignore_list.append(selected_item)
-        with IGNORE_FILE.open("w", encoding="utf-8") as file:
+        with ignore_file.open("w", encoding="utf-8") as file:
             json.dump(ignore_list, file)
 
     selections.insert(0, selected_item)
@@ -136,8 +121,28 @@ def item_selection(
     if og_len == len(starred_items) and max_history == -1:
         selections = []
 
-    with SELECTION_CACHE.open("w", encoding="utf-8") as file:
+    with selection_cache.open("w", encoding="utf-8") as file:
         json.dump(selections, file)
+
+
+def generate_cache_directory():
+    if os.getenv("PYTEST_TESTING"):
+        CACHE_PATH = Path("tests/files")
+
+    elif os.name != "nt":
+        CACHE_PATH = Path.home() / Path(".cache")
+    else:
+        env = os.getenv("APPDATA")
+        if isinstance(env, str):
+            CACHE_PATH = Path(env)
+        else:
+            CACHE_PATH = Path.home()
+
+    CACHE_PATH = CACHE_PATH / Path("github_random_star/")
+
+    CACHE_PATH.mkdir(parents=True, exist_ok=True)
+
+    return CACHE_PATH
 
 
 def main(
@@ -158,6 +163,7 @@ def main(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=logging.INFO,
     )
+    cache_path = generate_cache_directory()
 
     if account is None:
         account = os.environ.get("GH_STAR_ACCOUNT")
@@ -170,7 +176,7 @@ def main(
     token = os.environ.get("GH_STAR_TOKEN")
     github_api = GithubAPI(
         account,
-        CACHE_PATH,
+        cache_path,
         refresh=refresh,
         max_results=max_results,
         token=token,
@@ -182,6 +188,7 @@ def main(
 
     item_selection(
         starred_items,
+        cache_path,
         total=total,
         max_history=max_history,
         ignore=ignore,
