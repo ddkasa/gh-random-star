@@ -60,3 +60,7 @@ env = [
 pythonpath = [
   "."
 ]
+markers = [
+    "unit: Tests that or not using the API.",
+    "integration: Tests that use the API.",
+]
