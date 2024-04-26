@@ -6,7 +6,7 @@ from typing import NamedTuple, Optional
 
 import httpx
 
-log = logging.getLogger(__name__)
+log = logging.getLogger("GitHub Random Star")
 
 
 class StarredItem(NamedTuple):

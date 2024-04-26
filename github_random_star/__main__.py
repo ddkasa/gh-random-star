@@ -1,5 +1,5 @@
 import json
-import logging as log
+import logging
 import os
 import random
 import subprocess
@@ -8,9 +8,10 @@ from typing import Optional
 
 import fire
 
-
 from github_random_star.api import StarredItem, GithubAPI
 
+
+log = logging.getLogger("GitHub Random Star")
 
 if os.getenv("PYTEST_TESTING"):
     CACHE_PATH = Path("tests/files")
@@ -155,9 +156,9 @@ def main(
         AccountMissingError: If the GitHub account was not provided through
             flags or an environment variables.
     """
-    log.basicConfig(
+    logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        level=log.INFO,
+        level=logging.INFO,
     )
 
     if account is None:
