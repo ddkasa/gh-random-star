@@ -27,6 +27,7 @@ def extract_selection(path: Path) -> list[StarredItem]:
         list(StarredItem): List of starred items from the JSON file. Needs to
             stay a list in order to preserve order when keeping history.
     """
+
     data = []
     if path.exists():
         with path.open("r", encoding="utf-8") as file:
@@ -37,6 +38,35 @@ def extract_selection(path: Path) -> list[StarredItem]:
         data = [StarredItem(*item) for item in selections]
 
     return data
+
+
+def user_selection(
+    starred_items: set[StarredItem],
+    total: int,
+) -> tuple[StarredItem, float]:
+    items = random.sample(tuple(starred_items), total)
+
+    print("Which item would you like to select today?")
+    print("Note: Add .1 to number to add to ignore list")
+    while True:
+        for i, star in enumerate(items, start=1):
+            if not isinstance(star, StarredItem):
+                star = StarredItem(*star)
+
+            print(f"{i}. {star.name}")
+
+        try:
+            selection = float(input("> "))
+            if int(selection - 1) in range(total):
+                break
+        except ValueError:
+            pass
+
+        print(f"Select an item within the range of 1 and {total}")
+
+    selected_item = StarredItem(*items[int(selection - 1)])
+
+    return selected_item, selection
 
 
 def item_selection(
@@ -65,42 +95,21 @@ def item_selection(
 
     selections = extract_selection(selection_cache)
     if max_history != -1:
-        starred_items = starred_items - starred_items.intersection(selections)
+        starred_items -= starred_items.intersection(selections)
 
     if ignore_file.exists():
         ignore_list = extract_selection(ignore_file)
         if ignore:
-            starred_items = starred_items - starred_items.intersection(ignore_list)
+            starred_items -= starred_items.intersection(ignore_list)
     else:
         ignore_list = []
         with ignore_file.open("w", encoding="utf-8") as file:
             json.dump(ignore_list, file)
+            user_selection()
 
-    items = random.sample(tuple(starred_items), total)
-
-    print("Which item would you like to select today?")
-    print("Note: Add .1 to number to add to ignore list")
-    while True:
-        for i, star in enumerate(items, start=1):
-            if not isinstance(star, StarredItem):
-                star = StarredItem(*star)
-
-            print(f"{i}. {star.name}")
-
-        try:
-            selection = float(input("> "))
-            if int(selection - 1) in range(total):
-                break
-        except ValueError:
-            pass
-
-        print(f"Select an item within the range of 1 and {total}")
-
-    # TODO: Add a way of directly adding items to ignore list.
-    selected_item = StarredItem(*items[int(selection - 1)])
+    selected_item, selection = user_selection(starred_items, total)
 
     log.info("Opening %s", selected_item.url)
-
     subprocess.run(
         ["python", "-m", "webbrowser", "-t", selected_item.url],
         stdout=subprocess.DEVNULL,
@@ -143,7 +152,6 @@ def generate_cache_directory():
             CACHE_PATH = Path.home()
 
     CACHE_PATH = CACHE_PATH / Path("github_random_star/")
-
     CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
     return CACHE_PATH
