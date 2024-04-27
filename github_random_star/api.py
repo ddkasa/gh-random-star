@@ -6,6 +6,8 @@ from typing import NamedTuple, Optional
 
 import httpx
 
+from github_random_star.version import __version__
+
 log = logging.getLogger("GitHub Random Star")
 
 
@@ -106,12 +108,23 @@ class GithubAPI:
                 "Cache last refreshed on the %s.",
                 datetime.fromisoformat(cache_data["date"]).date().isoformat(),
             )
-            if cache_data.get("account") == self.account:
+            version = cache_data.get("version")
+
+
+            account = cache_data.get("account")
+            if account == self.account:
                 cache_data = {StarredItem(*item) for item in cache_data["data"]}
-                # TODO: Multiple cache file for different accounts.
+                if version != __version__:
+                    log.warning(
+                        "Cache is from a different version. Current: %s - Stored: %s",
+                        __version__,
+                        version,
+                    )
+                    self.save_cached_items(cache_data)
                 return cache_data
 
-            log.warning("Cache is storing a different account.")
+            if account != self.account:
+                log.warning("Cache is storing a different account.")
 
         return None
 
@@ -119,6 +132,7 @@ class GithubAPI:
         cache_path = self.cache_path / Path("cache.json")
         with cache_path.open("w", encoding="utf-8") as file:
             container = {
+                "version": __version__,
                 "account": self.account,
                 "date": datetime.now().isoformat(),
                 "data": tuple(data),
