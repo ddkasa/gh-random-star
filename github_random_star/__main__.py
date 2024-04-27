@@ -8,7 +8,7 @@ from typing import Optional
 
 import fire
 
-from github_random_star.api import GithubAPI, StarredItem
+from github_random_star.api import GithubAPI
 
 log = logging.getLogger("GitHub Random Star")
 
@@ -17,7 +17,7 @@ class AccountMissingError(TypeError):
     "GitHub account was not provided through flags or an environment variable."
 
 
-def extract_selection(path: Path) -> list[StarredItem]:
+def extract_selection(path: Path) -> list[str]:
     """Extracts selections from a JSON file.
 
     Args:
@@ -35,25 +35,20 @@ def extract_selection(path: Path) -> list[StarredItem]:
             if "data" in selections:
                 selections = selections["data"]
 
-        data = [StarredItem(*item) for item in selections]
-
     return data
 
 
 def user_selection(
-    starred_items: set[StarredItem],
+    starred_items: set[str],
     total: int,
-) -> tuple[StarredItem, float]:
+) -> tuple[str, float]:
     items = random.sample(tuple(starred_items), total)
 
     print("Which item would you like to select today?")
     print("Note: Add .1 to number to add to ignore list")
     while True:
         for i, star in enumerate(items, start=1):
-            if not isinstance(star, StarredItem):
-                star = StarredItem(*star)
-
-            print(f"{i}. {star.name}")
+            print(f"{i}. {star}")
 
         try:
             selection = float(input("> "))
@@ -64,19 +59,19 @@ def user_selection(
 
         print(f"Select an item within the range of 1 and {total}")
 
-    selected_item = StarredItem(*items[int(selection - 1)])
+    selected_item = items[int(selection - 1)]
 
     return selected_item, selection
 
 
 def item_selection(
-    starred_items: set[StarredItem],
+    data: dict,
     cache_path: Path,
     *,
     total: int,
     max_history: int = 100,
     ignore: bool = True,
-) -> None:
+) -> dict:
     """Selection function where the user chooses a random starred item.
 
     Args:
@@ -88,50 +83,37 @@ def item_selection(
         ignore: Whether or not to ignore previously selected items.
             Defaults to True.
     """
-    selection_cache = cache_path / Path("selections.json")
-    ignore_file = cache_path / Path("ignore.json")
 
-    og_len = len(starred_items)
+    og_len = len(data["data"])
+    starred_items = set(data["data"])
 
-    selections = extract_selection(selection_cache)
     if max_history != -1:
-        starred_items -= starred_items.intersection(selections)
+        starred_items -= starred_items.intersection(set(data["history"]))
 
-    if ignore_file.exists():
-        ignore_list = extract_selection(ignore_file)
-        if ignore:
-            starred_items -= starred_items.intersection(ignore_list)
-    else:
-        ignore_list = []
-        with ignore_file.open("w", encoding="utf-8") as file:
-            json.dump(ignore_list, file)
-            user_selection()
+    if ignore:
+        starred_items -= starred_items.intersection(set(data["ignore"]))
+
 
     selected_item, selection = user_selection(starred_items, total)
 
-    log.info("Opening %s", selected_item.url)
+    gh_url = "https://github.com/" + selected_item
+
+    log.info("Opening %s", gh_url)
     subprocess.run(
-        ["python", "-m", "webbrowser", "-t", selected_item.url],
+        ["python", "-m", "webbrowser", "-t", gh_url],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-    )
+        )
+    
+    if round(selection % 1, 1) == 0.1:
+        log.info("Adding %s to ignore list", selected_item)
+        data["ignore"].append(selected_item)
 
-    if selection % 1 != 0.1:
-        log.info("Adding %s to ignore list", selected_item.name)
-        ignore_list.append(selected_item)
-        with ignore_file.open("w", encoding="utf-8") as file:
-            json.dump(ignore_list, file)
+    data["history"].insert(0, selected_item)
+    if len(data["history"]) > max_history and max_history > 0:
+        data["history"] = data["history"][: -(len(data["history"]) - max_history)]
 
-    selections.insert(0, selected_item)
-    if len(selections) > max_history and max_history > 0:
-        selections = selections[: -(len(selections) - max_history)]
-
-    if og_len == len(starred_items) and max_history == -1:
-        selections = []
-
-    with selection_cache.open("w", encoding="utf-8") as file:
-        json.dump(selections, file)
-
+    return data
 
 def generate_cache_directory():
     """Setup for cache directory depending on the OS.
@@ -185,7 +167,7 @@ def main(
     if max_history is None:
         max_history = int(os.environ.get("GH_STAR_MAX_HISTORY", 100))
 
-    token = os.environ.get("GH_STAR_TOKEN")
+    token = os.environ.get("GITHUB_ACCESS_TOKEN")
     github_api = GithubAPI(
         account,
         cache_path,
@@ -198,13 +180,15 @@ def main(
 
     log.info("Total amount of starred items: %s", len(starred_items))
 
-    item_selection(
+    data = item_selection(
         starred_items,
         cache_path,
         total=total,
         max_history=max_history,
         ignore=ignore,
     )
+
+    github_api.save_cached_items(data["data"], data)
 
     log.info("Done!")
 
