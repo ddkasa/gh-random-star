@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import json
-
 import pytest
 import mock
 import builtins
@@ -16,41 +14,32 @@ def test_cache_path(cache_location):
 
 
 @pytest.mark.unit
-def test_file_load(load_starred_items):
-    assert load_starred_items
-
-
-@pytest.mark.unit
-def test_random_selection(set_seed, load_starred_items, cache_location):
+def test_random_selection(set_seed, cache_location, get_data):
     with mock.patch.object(builtins, "input", lambda _: 2):
-        assert (
+        assert isinstance(
             item_selection(
-                set(load_starred_items),
+                get_data,
                 cache_location,
                 total=3,
                 max_history=-1,
-            )
-            is None
+            ),
+            dict,
         )
 
 
 @pytest.mark.unit
-def test_ignore_file(set_seed, load_starred_items, cache_location):
-    ignore_file = cache_location / Path("ignore.json")
-    with ignore_file.open("r", encoding="utf-8") as file:
-        pre_len = len(json.load(file))
+def test_ignore_file(set_seed, cache_location, set_user_settings, get_data):
+    user, max_results, _ = set_user_settings
+    pre_len = len(get_data["ignore"])
 
     with mock.patch.object(builtins, "input", lambda _: 2.1):
-        assert (
-            item_selection(
-                set(load_starred_items),
-                cache_location,
-                total=3,
-                max_history=-1,
-            )
-            is None
+        sel = item_selection(
+            get_data,
+            cache_location,
+            total=3,
+            max_history=-1,
         )
 
-    with ignore_file.open("r", encoding="utf-8") as file:
-        post_len = len(json.load(file))
+    post_len = len(sel["ignore"])
+
     assert post_len - 1 == pre_len

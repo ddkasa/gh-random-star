@@ -24,6 +24,6 @@ def test_cli_integration(set_user_settings):
         stderr=subprocess.PIPE,
     )
 
-    out, _ = process.communicate(input=b"1")
+    out, _ = process.communicate(input=b"1.1")
 
     assert process.returncode == 0

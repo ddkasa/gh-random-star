@@ -1,8 +1,8 @@
 import random
-from pathlib import Path
 
 import pytest
-from github_random_star.__main__ import extract_selection, generate_cache_directory
+from github_random_star.__main__ import generate_cache_directory
+from github_random_star.api import GithubAPI
 
 
 @pytest.fixture(scope="session")
@@ -19,9 +19,12 @@ def set_user_settings():
 
 
 @pytest.fixture(scope="session")
-def load_starred_items():
-    test_path = Path("tests/files/load_test.json")
-    return extract_selection(test_path)
+def get_data(cache_location, set_user_settings):
+    gh_api = GithubAPI(
+        account=set_user_settings[0],
+        cache_location=cache_location,
+    )
+    return gh_api.collect_starred_items()
 
 
 @pytest.fixture(scope="session")
