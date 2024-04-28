@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 import httpx
 
@@ -12,6 +12,26 @@ log = logging.getLogger("GitHub Random Star")
 
 
 class GithubAPI:
+    """API wrapper for the GitHub API.
+
+    Handles fetching starred items from the GitHub API and cache.
+
+    Methods:
+        create_headers: Creates the headers for the API request.
+        collect_starred_items: Main method that run the the class.
+        get_starred_items: Fetches starred items from the API.
+        load_cached_items: Loads cached items from the cache.
+        save_cached_items: Formats saves cached items to a json file.
+
+    Attributes:
+        USER_API_URL: URL endpoint template for the API request.
+        account: GitHub account name.
+        headers: Headers for the API request.
+        cache_path: Path to the cache folder.
+        refresh: Whether to refresh the cache.
+        max_results: Maximum number of starred items to return.
+    """
+
     USER_API_URL = "https://api.github.com/users/{user}/starred?page={page}&per_page=30"
 
     def __init__(
@@ -45,7 +65,16 @@ class GithubAPI:
 
         return headers
 
-    def collect_starred_items(self) -> set[str]:
+    def collect_starred_items(self) -> dict[str, Any]:
+        """Main method that runs the the class functionality.
+
+        If the cache is valid, it will load it. Otherwise, it will request
+        the data from the API and keep requesting until a page is not found or
+        the maximum number of results is reached.
+
+        Returns:
+            dict: A dictionary with all the data needed to run the main script.
+        """
         cache = self.load_cached_items()
         if cache and not self.refresh:
             return cache
@@ -73,6 +102,7 @@ class GithubAPI:
         return self.save_cached_items(data, cache)
 
     def get_starred_items(self, page: int = 1) -> list[dict]:
+        # REFACTOR: Possibly adjust to use a persistent client instead.
         log.info("Requesting starred items page %s", page)
         url = self.USER_API_URL.format(user=self.account, page=page)
         response = httpx.get(url, headers=self.headers)
@@ -113,7 +143,18 @@ class GithubAPI:
         self,
         data: set[str],
         container: Optional[dict] = None,
-    ) -> None:
+    ) -> dict[str, Any]:
+        """Formats saves cached items to a json file.
+
+        Is meant to be used as a function to return starred data.
+
+        Args:
+            data: A set of starred items.
+            container: A dictionary with all the data needed to run the main
+                script.
+        Returns:
+            dict: A dictionary with all the data needed to run the main script.
+        """
         cache_path = self.cache_path / Path(f"{self.account}_cache.json")
 
         if container is None:
