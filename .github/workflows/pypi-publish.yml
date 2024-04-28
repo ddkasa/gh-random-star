@@ -7,6 +7,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env: 
+      GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
     - uses: actions/checkout@v3
@@ -22,7 +24,7 @@ jobs:
         poetry install --with dev
 
     - name: Run tests
-      run: poetry run pytest -m unit
+      run: poetry run pytest
 
   build:
     needs: test
