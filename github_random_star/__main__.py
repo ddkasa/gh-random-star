@@ -42,10 +42,22 @@ def user_selection(
     starred_items: set[str],
     total: int,
 ) -> tuple[str, float]:
+    """Selection function where the user chooses a random starred item.
+
+    Args:
+        starred_items: Set of starred items from GitHub.
+        total: Number of items to select from.
+
+    Returns:
+        tuple(StarredItem, float): Selected item and the selection number for
+            further processing
+
+    """
     items = random.sample(tuple(starred_items), total)
 
     print("Which item would you like to select today?")
     print("Note: Add .1 to number to add to ignore list")
+    # TODO: Add a way of removing a starred item from a user if api key is present.
     while True:
         for i, star in enumerate(items, start=1):
             print(f"{i}. {star}")
@@ -84,15 +96,14 @@ def item_selection(
             Defaults to True.
     """
 
-    og_len = len(data["data"])
     starred_items = set(data["data"])
 
+    # TODO: Need a way of avoiding keeping enough items in the history.
     if max_history != -1:
         starred_items -= starred_items.intersection(set(data["history"]))
 
     if ignore:
         starred_items -= starred_items.intersection(set(data["ignore"]))
-
 
     selected_item, selection = user_selection(starred_items, total)
 
@@ -103,8 +114,8 @@ def item_selection(
         ["python", "-m", "webbrowser", "-t", gh_url],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
-        )
-    
+    )
+
     if round(selection % 1, 1) == 0.1:
         log.info("Adding %s to ignore list", selected_item)
         data["ignore"].append(selected_item)
@@ -114,6 +125,7 @@ def item_selection(
         data["history"] = data["history"][: -(len(data["history"]) - max_history)]
 
     return data
+
 
 def generate_cache_directory():
     """Setup for cache directory depending on the OS.
