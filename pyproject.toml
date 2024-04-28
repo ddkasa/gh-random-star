@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "github-random-star"
-version = "0.0.6"
+version = "0.1.1"
 description = "Simple CLI tool to fetch random starred items from a users GitHub profile."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 readme = "README.md"
@@ -61,6 +61,6 @@ pythonpath = [
   "."
 ]
 markers = [
-    "unit: Tests that or not using the API.",
+    "unit: Basic unit tests using local cache.",
     "integration: Tests that use the API.",
 ]
