@@ -14,7 +14,9 @@ If you have starred way too many GitHub repositories and need a way of keeping t
 
 Install with [Pipx](https://github.com/pypa/pipx).
 
-`$ pipx install github-random-star`
+```
+$ pipx install github-random-star
+```
 
 ### Other
 
@@ -23,23 +25,25 @@ Install from [PyPi](https://pypi.org/project/github-random-star)/[GitHub](https:
 ## Usage
 
 1. Setup GitHub API token as the `GITHUB_ACCESS_TOKEN` environment variable. _If this is not setup it will use the public access point with lower rates._
-2. Run the script through `$ gh-star <flags>`, `$ python github_random_star/main.py <flags>` or if using Poetry `$ poetry run gh-star <flags>`
+2. Run the script through `$ gh-star star <account> <flags>`.
+3. Run `$ gh-star help star` to get help.
+
+## Arguments
+- `<account>` Username of the GitHub account to retrieve the starred items from. **Required**
 
 ### Flags
 
-- `-a, --account` Username of the GitHub account to retrieve the starred items from. `--account` is required or `GH_STAR_ACCOUNT` environment variable needs to be set.
 - `-t, --total` Total amount of random items you want to pick from. Defaults to 3.
 - `-r, --refresh` Whether to fetch new cached data or not. Will re fetch all starred items instead of using cache.
 - `--max-history` The amount of historic choices to cache. Defaults to 100. Set to **-1** to keep history unlimited. `GH_STAR_MAX_HISTORY` environment variable can be used to override this value.
 - `-i, --ignore` If to use a list of repositories to ignore. Defaults to true.
 - `--max_results` The amount of starred items to retrieve from GitHub. Defaults to all.
-- `-h --help` Show this help message inside the terminal.
 
 ### Examples
 
-- `$ gh-star -a ddkasa`
-- `$ gh-star -a ddkasa -t 5`
-- `$ gh-star -a ddkasa -r -t 5`
+- `$ gh-star star ddkasa`
+- `$ gh-star star ddkasa -t 5`
+- `$ gh-star star ddkasa -r -t 5`
 
 ## Development
 
