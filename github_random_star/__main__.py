@@ -28,7 +28,7 @@ def extract_selection(path: Path) -> list[str]:
             stay a list in order to preserve order when keeping history.
     """
 
-    data = []
+    data: list[str] = []
     if path.exists():
         with path.open("r", encoding="utf-8") as file:
             selections = json.load(file)
