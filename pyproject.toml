@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "github-random-star"
-version = "0.1.1"
+version = "1.0.0"
 description = "Simple CLI tool to fetch random starred repositories from a users GitHub profile."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 readme = "README.md"
@@ -30,9 +30,9 @@ keywords = [
 packages = [{include = "github_random_star"}]
 
 [tool.poetry.urls]
-"Homepage" = "https://github.com/ddkasa/github-random-star"
-"Source" = "https://github.com/ddkasa/github-random-star"
-"Bug Tracker" = "https://github.com/ddkasa/github-random-star/issues"
+"Homepage" = "https://github.com/ddkasa/gh-random-star"
+"Source" = "https://github.com/ddkasa/gh-random-star"
+"Bug Tracker" = "https://github.com/ddkasa/gh-random-star/issues"
 
 [tool.poetry.scripts]
 gh-star = "github_random_star.extension:run"
