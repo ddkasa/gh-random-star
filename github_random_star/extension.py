@@ -1,4 +1,5 @@
 import sys
+import logging
 
 from cleo.application import Application
 from cleo.io.inputs.string_input import StringInput
@@ -8,6 +9,11 @@ from github_random_star.version import __version__
 
 
 def run(args=None):
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO,
+    )
+
     app = Application(
         name="Github Random Star",
         version=__version__,

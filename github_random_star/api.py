@@ -52,7 +52,7 @@ class GithubAPI:
 
         self.convert_cache()
 
-    def create_headers(self, token: Optional[str] = None) -> None:
+    def create_headers(self, token: Optional[str] = None) -> dict:
         headers = {"X-GitHub-Api-Version": "2022-11-28"}
 
         if token:
@@ -98,10 +98,9 @@ class GithubAPI:
                 break
 
             page += 1
-
         return self.save_cached_items(data, cache)
 
-    def get_starred_items(self, page: int = 1) -> list[dict]:
+    def get_starred_items(self, page: int = 1) -> dict:
         # REFACTOR: Possibly adjust to use a persistent client instead.
         log.info("Requesting starred items page %s", page)
         url = self.USER_API_URL.format(user=self.account, page=page)
@@ -116,7 +115,7 @@ class GithubAPI:
 
         return response.json()
 
-    def load_cached_items(self) -> set[str] | None:
+    def load_cached_items(self) -> dict[str, Any] | None:
         cache_path = self.cache_path / Path(f"{self.account}_cache.json")
         if not cache_path.exists():
             return None
@@ -176,7 +175,7 @@ class GithubAPI:
         return container
 
     def convert_cache(self) -> None:
-        def convert_old_cache(data: list[list]) -> set[str]:
+        def convert_old_cache(data: list[list]) -> list[str]:
             return [item[1] for item in data]
 
         cache_path = self.cache_path / Path("cache.json")
