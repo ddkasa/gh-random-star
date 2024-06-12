@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+if [[ "$OSTYPE" == "msys" ]]; then
+    PYTHON="python"
+else
+    if [[ $(python3 --version) ]]; then
+        PYTHON="python3"
+    else
+        PYTHON="python"
+    fi
+fi
+
+if [[ "$OSTYPE" == "msys" ]]; then
+    PIP="pip"
+else
+    if [[ $(pip3 --version) ]]; then
+        PIP="pip3"
+    else
+        PIP="pip"
+    fi
+fi
+
+if [[ "$(pwd -W)" ]] 2> /dev/null; then 
+  CALLING_DIR=$(pwd -W)
+else 
+  CALLING_DIR=$(pwd)
+fi
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd "${SCRIPT_DIR}"
+
+export PYTHONPATH="${SCRIPT_DIR}/.gh-py"
+export PATH="${SCRIPT_DIR}/.gh-py/bin:${PATH}"
+
+result=true
+for dir in "${SCRIPT_DIR}/.gh-py" "${SCRIPT_DIR}/.venv"
+do
+    if ! [ -d "$dir" ]; then
+        result=false
+        break
+    fi
+done
+
+if (! $result ) then
+    echo "Installing extension environment."
+    if [ ! -d "${SCRIPT_DIR}/.gh-py" ]; then
+      $PIP install --upgrade --target "${SCRIPT_DIR}/.gh-py" -q poetry
+    fi
+    if [ ! -d "${SCRIPT_DIR}/.venv" ]; then
+      "${SCRIPT_DIR}/.gh-py/bin/poetry" config virtualenvs.in-project true
+      "${SCRIPT_DIR}/.gh-py/bin/poetry" install -q
+    fi
+    echo "Extension environment installed."
+fi
+
+if [ "$1" = "poetry" ]; then
+    shift
+    "${SCRIPT_DIR}/.gh-py/bin/poetry" $@
+    exit 0;
+  fi
+
+if [ "pyproject.toml" -nt "poetry.lock" ] || [ ! -f "poetry.lock" ]; then
+    echo "Updating extension environment."
+    "${SCRIPT_DIR}/.gh-py/bin/poetry" config virtualenvs.in-project true
+    "${SCRIPT_DIR}/.gh-py/bin/poetry" update -q -n
+    echo "Extension environment updated."
+fi
+
+"${SCRIPT_DIR}/.gh-py/bin/poetry" run python -c "import os;os.chdir('$CALLING_DIR');import extension;extension.run('$*')"
+exit 0;
