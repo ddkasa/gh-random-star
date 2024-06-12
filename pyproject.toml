@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "github-random-star"
 version = "0.1.1"
-description = "Simple CLI tool to fetch random starred items from a users GitHub profile."
+description = "Simple CLI tool to fetch random starred repositories from a users GitHub profile."
 authors = ["David Kasakaitis <davidkasakaitis@proton.me>"]
 readme = "README.md"
 license = "MIT"
@@ -27,6 +27,7 @@ keywords = [
     "github",
     "git"
 ]
+packages = [{include = "github_random_star"}]
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/ddkasa/github-random-star"
@@ -34,13 +35,13 @@ keywords = [
 "Bug Tracker" = "https://github.com/ddkasa/github-random-star/issues"
 
 [tool.poetry.scripts]
-gh-star = "github_random_star:gh_star"
+gh-star = "github_random_star.extension:run"
 
 
 [tool.poetry.dependencies]
 python = "^3.12"
 httpx = "^0.26.0"
-fire = "^0.5.0"
+cleo = "^2.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -64,3 +65,7 @@ markers = [
     "unit: Basic unit tests using local cache.",
     "integration: Tests that use the API.",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true
+
