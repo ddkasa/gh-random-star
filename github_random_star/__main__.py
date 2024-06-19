@@ -49,7 +49,7 @@ def generate_cache_directory():
 # REFACTOR: Compose into two objects separating the CLI and selection process.
 class RandomStarCommand(Command):
     name = "star"
-    description = "Fetch random starred repositories from GitHub Profile."
+    description = "Fetch random starred repositories from a GitHub Profile."
     arguments: list[Argument] = [
         argument(
             "account",
@@ -68,7 +68,7 @@ class RandomStarCommand(Command):
         option(
             "refresh",
             "r",
-            "Whether to fetch new cached data or not. Will re fetch all starred items instead of using cache.",
+            "Whether to fetch new cached data or not. Will re-fetch all starred items instead of using cache.",
         ),
         option(
             "max_history",
@@ -223,7 +223,7 @@ class RandomStarCommand(Command):
         )
 
         if round(selection % 1, 1) == 0.1:
-            self.line("Adding {selected_item} to ignore list", style="info")
+            self.line(f"Adding {selected_item} to ignore list", style="info")
             data["ignore"].append(selected_item)
 
         data["history"].insert(0, selected_item)
