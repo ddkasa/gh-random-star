@@ -1,8 +1,9 @@
 import random
+import os
 
 import pytest
 from github_random_star.__main__ import generate_cache_directory
-from github_random_star.api import GithubAPI
+from github_random_star.api import GHStars
 
 
 @pytest.fixture(scope="session")
@@ -20,11 +21,13 @@ def set_user_settings():
 
 @pytest.fixture(scope="session")
 def get_data(cache_location, set_user_settings):
-    gh_api = GithubAPI(
+    gh_api = GHStars(
         account=set_user_settings[0],
         cache_location=cache_location,
+        max_results=set_user_settings[1],
+        token=os.environ.get("GITHUB_ACCESS_TOKEN"),
     )
-    return gh_api.collect_starred_items()
+    return gh_api.collect_items()
 
 
 @pytest.fixture(scope="session")

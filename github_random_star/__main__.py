@@ -13,7 +13,7 @@ from cleo.commands.command import Command
 from cleo.helpers import option, Option, Argument, argument
 from cleo.io.outputs.output import Verbosity
 
-from github_random_star.api import GithubAPI
+from github_random_star.api import GHStars
 
 log = logging.getLogger("GitHub Random Star")
 
@@ -103,7 +103,7 @@ class RandomStarCommand(Command):
         cache_path = generate_cache_directory()
 
         token = os.environ.get("GITHUB_ACCESS_TOKEN")
-        github_api = GithubAPI(
+        github_api = GHStars(
             self.argument("account"),
             cache_path,
             refresh=self.option("refresh"),
