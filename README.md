@@ -8,6 +8,8 @@
 
 If you have starred way too many GitHub repositories and need a way of keeping track of them. This simple CLI tool throws you quasi random starred repos at you to look at and explore.
 
+If you are struggling with selection paralysis; it also allows for selecting random repositories from a GitHub user.
+
 ## Installation
 
 ### Preferred
@@ -26,15 +28,19 @@ gh extension install ddkasa/github-random-star
 
 ## Usage
 
-- Setup GitHub API token as the `GITHUB_ACCESS_TOKEN` environment variable. _If this is not setup it will use the public access point with lower rates._
+- Setup GitHub API token as the `GITHUB_TOKEN` environment variable. _If this is not setup it will use the public access point with lower rates._
 
 ### PyPi
-- Run the script through `gh-star star <account> <flags>`.
+- Run the script through `gh-star <command> <account> <flags>`.
 - Run `gh-star help star` to get help.
 
 ### GitHub CLI
-- Run the script through `gh random-star star <account> <flags>`.
+- Run the script through `gh random-star <command> <account> <flags>`.
 - Run `gh random-star help star` to get help.
+
+### Commands
+1. `star` Randomly select from all starred items of a GH user.
+2. `repo` Randomly select from a GH users repositories.
 
 ### Arguments
 - `<account>` Username of the GitHub account to retrieve the starred items from. **Required**
@@ -50,9 +56,11 @@ gh extension install ddkasa/github-random-star
 ### Examples
 
 - `gh-star star ddkasa`
+- `gh-star repo ddkasa`
 - `gh-star star ddkasa -t 5`
 - `gh-star star ddkasa -r -t 5`
 - `gh random-star star ddkasa`
+- `gh random-star repo ddkasa`
 
 ## Development
 
