@@ -216,3 +216,8 @@ class GithubAPI(ABC):
 class GHStars(GithubAPI):
     USER_PARAMS = GithubAPI.USER_PARAMS + "starred?page={page}&per_page=30"
     CACHE_PATH = "{account}_cache.json"
+
+
+class GHRepos(GithubAPI):
+    USER_PARAMS = GithubAPI.USER_PARAMS + "repos?page={page}&per_page=30"
+    CACHE_PATH = "{account}_repo_cache.json"

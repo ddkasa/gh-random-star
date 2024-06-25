@@ -4,7 +4,7 @@ import logging
 from cleo.application import Application
 from cleo.io.inputs.string_input import StringInput
 
-from github_random_star.commands import StarCommand
+from github_random_star.commands import StarCommand, RepoCommand
 from github_random_star.version import __version__
 
 
@@ -18,8 +18,8 @@ def run(args=None):
         name="Github Random Star",
         version=__version__,
     )
-    cmd = StarCommand()
-    app.add(cmd)
+    app.add(StarCommand())
+    app.add(RepoCommand())
 
     try:
         if args:
