@@ -2,7 +2,7 @@ import random
 import os
 
 import pytest
-from github_random_star.__main__ import generate_cache_directory
+from github_random_star.utility import generate_cache_directory
 from github_random_star.api import GHStars
 
 

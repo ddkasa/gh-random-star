@@ -4,56 +4,29 @@ import json
 import logging
 import os
 import random
-from typing import Any
+from typing import Any, Final
 import subprocess
 from pathlib import Path
 
-from cleo.application import Application
 from cleo.commands.command import Command
 from cleo.helpers import option, Option, Argument, argument
 from cleo.io.outputs.output import Verbosity
 
-from github_random_star.api import GHStars
+from github_random_star.api import GithubAPI
+from github_random_star.utility import generate_cache_directory
+
 
 log = logging.getLogger("GitHub Random Star")
 
 
-class AccountMissingError(TypeError):
-    "GitHub account was not provided through flags or an environment variable."
+class BaseCommand(Command):
+    GH_URL: Final[str] = "https://github.com/"
+    API: type[GithubAPI]
 
-
-def generate_cache_directory():
-    """Setup for cache directory depending on the OS.
-
-    Returns:
-        Path: Path to the cache directory.
-    """
-    if os.getenv("PYTEST_TESTING"):
-        CACHE_PATH = Path("tests/files")
-
-    elif os.name != "nt":
-        CACHE_PATH = Path.home() / Path(".cache")
-    else:
-        env = os.getenv("APPDATA")
-        if isinstance(env, str):
-            CACHE_PATH = Path(env)
-        else:
-            CACHE_PATH = Path.home()
-
-    CACHE_PATH = CACHE_PATH / Path("github_random_star/")
-    CACHE_PATH.mkdir(parents=True, exist_ok=True)
-
-    return CACHE_PATH
-
-
-# REFACTOR: Compose into two objects separating the CLI and selection process.
-class RandomStarCommand(Command):
-    name = "star"
-    description = "Fetch random starred repositories from a GitHub Profile."
     arguments: list[Argument] = [
         argument(
             "account",
-            description="Account to fetch starred repositories from.",
+            description="Account to fetch data from.",
         )
     ]
     options: list[Option] = [
@@ -68,7 +41,7 @@ class RandomStarCommand(Command):
         option(
             "refresh",
             "r",
-            "Whether to fetch new cached data or not. Will re-fetch all starred items instead of using cache.",
+            "Whether to fetch new cached data or not. Will re-fetch all repositories instead of using cache.",
         ),
         option(
             "max_history",
@@ -84,7 +57,7 @@ class RandomStarCommand(Command):
         ),
         option(
             "max_results",
-            description="The amount of starred items to retrieve from GitHub. Defaults to all.",
+            description="The max amount of items to retrieve from GitHub. Defaults to all.",
             value_required=False,
             flag=False,
             default=0,
@@ -102,24 +75,23 @@ class RandomStarCommand(Command):
         """Basic entrypoint for the CLI script."""
         cache_path = generate_cache_directory()
 
-        token = os.environ.get("GITHUB_ACCESS_TOKEN")
-        github_api = GHStars(
+        github_api = self.API(
             self.argument("account"),
             cache_path,
             refresh=self.option("refresh"),
             max_results=self.option("max_results"),
-            token=token,
+            token=os.environ.get("GITHUB_ACCESS_TOKEN"),
         )
-        starred_items = github_api.collect_starred_items()
+        repositories = github_api.collect_items()
 
         self.line(
-            f"Total amount of starred items: {len(starred_items["data"])}",
+            f"Total amount of repositories: {len(repositories["data"])}",
             style="info",
         )
 
-        data = self.item_selection(starred_items, cache_path)
+        data = self.item_selection(repositories, cache_path)
 
-        github_api.save_cached_items(data["data"], data)
+        github_api.save_items(data["data"], data)
 
         self.line("Done!", style="info")
 
@@ -146,20 +118,20 @@ class RandomStarCommand(Command):
 
     def user_selection(
         self,
-        starred_items: set[str],
+        raw_items: set[str],
     ) -> tuple[str, float]:
-        """Selection function where the user chooses a random starred item.
+        """Selection function where the user chooses a random repository.
 
         Args:
             starred_items: Set of starred items from GitHub.
 
         Returns:
-            tuple(StarredItem, float): Selected item and the selection number for
+            tuple[str, float]: Selected item and the selection number for
                 further processing
 
         """
         total = self.option("total")
-        items = random.sample(tuple(starred_items), total)
+        items = random.sample(tuple(raw_items), total)
 
         self.line("Which repository would you like to view today?", style="question")
         self.line(
@@ -167,7 +139,6 @@ class RandomStarCommand(Command):
             style="info",
             verbosity=Verbosity.VERBOSE,
         )
-        # TODO: Add a way of removing a starred item from a user if api key is present.
         while True:
             for i, star in enumerate(items, start=1):
                 print(f"{i}. {star}")
@@ -189,31 +160,31 @@ class RandomStarCommand(Command):
         return selected_item, selection
 
     def item_selection(self, data: dict, cache_path: Path) -> dict[str, Any]:
-        """Selection function where the user chooses a random starred item.
+        """Selection function where the user chooses a repository.
 
         Args:
-            starred_items: Set of starred items from GitHub.
+            items: Set of items from GitHub.
             cache_path: Path to the cache directory.
 
         Returns:
             dict: A dictionary with all the data to be cached to the JSON file.
         """
 
-        starred_items = set(data["data"])
+        items = set(data["data"])
 
         max_history = self.option("max_history")
         ignore = not self.option("ignore")
 
         # TODO: Need a way of avoiding keeping enough items in the history.
         if max_history != -1:
-            starred_items -= starred_items.intersection(set(data["history"]))
+            items -= items.intersection(set(data["history"]))
 
         if ignore:
-            starred_items -= starred_items.intersection(set(data["ignore"]))
+            items -= items.intersection(set(data["ignore"]))
 
-        selected_item, selection = self.user_selection(starred_items)
+        selected_item, selection = self.user_selection(items)
 
-        gh_url = "https://github.com/" + selected_item
+        gh_url = self.GH_URL + selected_item
 
         log.info("Opening %s", gh_url)
         subprocess.run(
@@ -231,9 +202,3 @@ class RandomStarCommand(Command):
             data["history"] = data["history"][: -(len(data["history"]) - max_history)]
 
         return data
-
-
-if __name__ == "__main__":
-    app = Application()
-    app.add(RandomStarCommand())
-    app.run()

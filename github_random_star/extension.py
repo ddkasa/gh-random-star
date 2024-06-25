@@ -4,7 +4,7 @@ import logging
 from cleo.application import Application
 from cleo.io.inputs.string_input import StringInput
 
-from github_random_star.__main__ import RandomStarCommand
+from github_random_star.commands import StarCommand
 from github_random_star.version import __version__
 
 
@@ -18,7 +18,7 @@ def run(args=None):
         name="Github Random Star",
         version=__version__,
     )
-    cmd = RandomStarCommand()
+    cmd = StarCommand()
     app.add(cmd)
 
     try:
