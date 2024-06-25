@@ -8,7 +8,7 @@ from typing import Any, Final, Optional
 
 from httpx import Client, codes
 
-from github_random_star.version import __version__, process_version
+from github_random_star.version import __version__, VersionNo
 
 log = logging.getLogger("GitHub Random Star")
 
@@ -62,7 +62,7 @@ class GithubAPI(ABC):
         self.cache_path = cache_location
         self.refresh = refresh
         self.max_results = max_results
-        self.version = process_version(__version__)
+        self.version = VersionNo.process_version(__version__)
         self.client = Client(
             headers=self.create_headers(token),
             base_url=self.API_BASE_URL,
@@ -164,7 +164,7 @@ class GithubAPI(ABC):
             datetime.fromisoformat(cache_data["date"]).date().isoformat(),
         )
 
-        version = process_version(cache_data.get("version", "0.0.0"))
+        version = VersionNo.process_version(cache_data.get("version", "0.0.0"))
         if self.version != version:
             log.warning(
                 "Cache is from a different version. Current: %s - Stored: %s",

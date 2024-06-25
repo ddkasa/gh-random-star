@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 
 class VersionNo(NamedTuple):
@@ -13,7 +13,9 @@ class VersionNo(NamedTuple):
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}"
 
-    def __gt__(self, other: VersionNo) -> bool:
+    def __gt__(self, other: object) -> bool:
+        if not isinstance(other, VersionNo):
+            return False
         if self == other:
             return False
         if self.major > other.major:
@@ -28,17 +30,18 @@ class VersionNo(NamedTuple):
             return True
         return False
 
-    def __eq__(self, other: VersionNo) -> bool:
+    def __eq__(self, other: object) -> bool:
         return (
-            self.major == other.major
+            isinstance(other, VersionNo)
+            and self.major == other.major
             and self.minor == other.minor
             and self.patch == other.patch
         )
 
-    def __ne__(self, other: VersionNo) -> bool:
+    def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-
-def process_version(version: str) -> VersionNo:
-    major, minor, patch = version.split(".")
-    return VersionNo(int(major), int(minor), int(patch))
+    @staticmethod
+    def process_version(version: str) -> VersionNo:
+        major, minor, patch = version.split(".")
+        return VersionNo(int(major), int(minor), int(patch))
