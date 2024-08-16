@@ -10,7 +10,7 @@ from httpx import Client, codes
 
 from github_random_star.version import __version__, VersionNo
 
-log = logging.getLogger("GitHub Random Star")
+log = logging.getLogger("github-random-star")
 
 
 class GithubAPI(ABC):

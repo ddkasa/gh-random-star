@@ -5,9 +5,6 @@ import os
 from pathlib import Path
 
 
-log = logging.getLogger("GitHub Random Star")
-
-
 class AccountMissingError(TypeError):
     "GitHub account was not provided through flags or an environment variable."
 
@@ -34,3 +31,10 @@ def generate_cache_directory():
     CACHE_PATH.mkdir(parents=True, exist_ok=True)
 
     return CACHE_PATH
+
+
+def setup_logging(level: int = logging.INFO) -> None:
+    logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=level,
+    )
