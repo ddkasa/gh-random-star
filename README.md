@@ -6,13 +6,11 @@
 
 ![](docs/example_image.png?raw=true)
 
-If you have starred way too many GitHub repositories and need a way of keeping track of them. This simple CLI tool throws you quasi random starred repos at you to look at and explore.
+> If you have starred way too many GitHub repositories and need a way of keeping track of them. This simple CLI tool throws you quasi random starred repos at you to look at and explore.
 
-If you are struggling with selection paralysis; it also allows for selecting random repositories from a GitHub user.
+> If you are struggling with selection paralysis; it also allows for selecting random repositories from a GitHub user.
 
 ## Installation
-
-### Preferred
 
 #### Install with [Pipx](https://github.com/pypa/pipx) or Pip.
 
@@ -31,18 +29,22 @@ gh extension install ddkasa/github-random-star
 - Setup GitHub API token as the `GITHUB_TOKEN` environment variable. _If this is not setup it will use the public access point with lower rates._
 
 ### PyPi
+
 - Run the script through `gh-star <command> <account> <flags>`.
 - Run `gh-star help star` to get help.
 
 ### GitHub CLI
+
 - Run the script through `gh random-star <command> <account> <flags>`.
 - Run `gh random-star help star` to get help.
 
 ### Commands
+
 1. `star` Randomly select from all starred items of a GH user.
 2. `repo` Randomly select from a GH users repositories.
 
 ### Arguments
+
 - `<account>` Username of the GitHub account to retrieve the starred items from. **Required**
 
 ### Flags
@@ -55,10 +57,15 @@ gh extension install ddkasa/github-random-star
 
 ### Examples
 
+##### PyPI
+
 - `gh-star star ddkasa`
 - `gh-star repo ddkasa`
 - `gh-star star ddkasa -t 5`
 - `gh-star star ddkasa -r -t 5`
+
+##### GitHub CLI
+
 - `gh random-star star ddkasa`
 - `gh random-star repo ddkasa`
 
@@ -67,15 +74,19 @@ gh extension install ddkasa/github-random-star
 Development is run through [Poetry](https://github.com/python-poetry/poetry).
 
 ### Basic Setup
+
 1. `git clone https://github.com/ddkasa/github-random-star`
 2. `cd github-random-star`
 3. `poetry shell`
 4. `poetry install`
+5. `poetry run gh-star`
 
 ### Testing
+
 - Use `pytest` for all tests.
 - Use `pytest -m unit` for unit tests.
 - Use `pytest -m integration` for integration tests.
 
 ## License
+
 MIT. Look at the [LICENSE](LICENSE.md) for details.
