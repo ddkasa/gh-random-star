@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import logging
 import os
 import random
 from typing import Any, Final
@@ -14,9 +13,6 @@ from cleo.io.outputs.output import Verbosity
 
 from github_random_star.api import GithubAPI
 from github_random_star.utility import generate_cache_directory
-
-
-log = logging.getLogger("GitHub Random Star")
 
 
 class BaseCommand(Command):
@@ -159,6 +155,16 @@ class BaseCommand(Command):
 
         return selected_item, selection
 
+    def open_url(self, url: str) -> None:
+        gh_url = self.GH_URL + url
+
+        self.line(f"Opening {gh_url}!", style="info")
+        subprocess.run(
+            ["python", "-m", "webbrowser", "-t", gh_url],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+
     def item_selection(self, data: dict, cache_path: Path) -> dict[str, Any]:
         """Selection function where the user chooses a repository.
 
@@ -188,14 +194,7 @@ class BaseCommand(Command):
 
         selected_item, selection = self.user_selection(items)
 
-        gh_url = self.GH_URL + selected_item
-
-        log.info("Opening %s", gh_url)
-        subprocess.run(
-            ["python", "-m", "webbrowser", "-t", gh_url],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+        self.open_url(selected_item)
 
         if round(selection % 1, 1) == 0.1:
             self.line(f"Adding {selected_item} to ignore list", style="info")
