@@ -177,7 +177,11 @@ class BaseCommand(Command):
 
         # TODO: Need a way of avoiding keeping enough items in the history.
         if max_history != -1:
-            items -= items.intersection(set(data["history"]))
+            history = data["history"]
+            if len(history) >= len(data) - self.option("total"):
+                data["history"] = []
+            else:
+                items -= items.intersection(set(history))
 
         if ignore:
             items -= items.intersection(set(data["ignore"]))
