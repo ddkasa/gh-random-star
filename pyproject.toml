@@ -8,7 +8,7 @@ license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
-    "Topic :: Utilities",   
+    "Topic :: Utilities",
     "License :: OSI Approved :: MIT License",
     "Development Status :: 5 - Production/Stable",
     "Environment :: Console",
@@ -17,17 +17,11 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "Natural Language :: English",
     "Typing :: Typed",
-    "Topic :: Software Development :: Version Control :: Git"
-    ]
-
-keywords = [
-    "python",
-    "python3",
-    "cli",
-    "github",
-    "git"
+    "Topic :: Software Development :: Version Control :: Git",
 ]
-packages = [{include = "github_random_star"}]
+
+keywords = ["python", "python3", "cli", "github", "git"]
+packages = [{ include = "github_random_star" }]
 
 [tool.poetry.urls]
 "Homepage" = "https://github.com/ddkasa/gh-random-star"
@@ -55,12 +49,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-env = [
-    "PYTEST_TESTING=True",
-]
-pythonpath = [
-  "."
-]
+env = ["PYTEST_TESTING=True"]
+pythonpath = ["."]
 markers = [
     "unit: Basic unit tests using local cache.",
     "integration: Tests that use the API.",
@@ -68,4 +58,3 @@ markers = [
 
 [tool.mypy]
 ignore_missing_imports = true
-
