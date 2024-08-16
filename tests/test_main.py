@@ -57,7 +57,6 @@ def test_filter_data(capsys, monkeypatch):
     cmd = app.find("repo")
 
     monkeypatch.setattr(cmd, "option", lambda x: True)
-
     monkeypatch.setattr(
         cmd,
         "line",
@@ -79,5 +78,22 @@ def test_filter_data(capsys, monkeypatch):
     out, err = capsys.readouterr()
 
     assert "History too long. Clearing.." in out
-    assert "" == err
+    assert err == ""
     assert len(data["history"]) == 0
+
+
+@pytest.mark.unit
+def test_open_url(capsys, monkeypatch):
+    expected_message = "Opening ddkasa/gh-random-star"
+    cmd = RepoCommand()
+    monkeypatch.setattr(
+        cmd,
+        "line",
+        lambda *_, **__: print(expected_message),
+    )
+    cmd.open_url("ddkasa/gh-random-star")
+
+    out, err = capsys.readouterr()
+
+    assert expected_message in out
+    assert err == ""
