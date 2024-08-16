@@ -1,12 +1,12 @@
 import builtins
-from pathlib import Path
 import json
+from pathlib import Path
 
 import mock  # type: ignore[import]
 import pytest
 from cleo.application import Application
 from cleo.testers.command_tester import CommandTester
-from github_random_star.commands import StarCommand
+from github_random_star.commands import RepoCommand, StarCommand
 
 
 @pytest.mark.unit
@@ -47,3 +47,37 @@ def test_ignore_file(set_seed, cache_location, set_user_settings, get_data):
         post_len = len(json.load(f)["ignore"])
 
     assert post_len - 1 == pre_len
+
+
+@pytest.mark.unit
+def test_filter_data(capsys, monkeypatch):
+    app = Application()
+    app.add(RepoCommand())
+
+    cmd = app.find("repo")
+
+    monkeypatch.setattr(cmd, "option", lambda x: True)
+
+    monkeypatch.setattr(
+        cmd,
+        "line",
+        lambda *_, **__: print("History too long. Clearing..."),
+    )
+
+    data = {
+        "data": [
+            "ddkasa/gh-random-star",
+            "ddkasa/ulauncher-toggl-extension",
+            "ddkasa/Aoe4bot",
+        ],
+        "ignore": [],
+        "history": ["wadawd", "awdawd", "wadwadaw"],
+    }
+
+    cmd._filter_data(data, 3)
+
+    out, err = capsys.readouterr()
+
+    assert "History too long. Clearing.." in out
+    assert "" == err
+    assert len(data["history"]) == 0

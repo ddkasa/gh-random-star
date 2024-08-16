@@ -133,7 +133,7 @@ class BaseCommand(Command):
         self.line(
             "Note: Add .1 to number to add to ignore list",
             style="info",
-            verbosity=Verbosity.VERBOSE,
+            verbosity=Verbosity.NORMAL,
         )
         while True:
             for i, star in enumerate(items, start=1):
@@ -165,6 +165,24 @@ class BaseCommand(Command):
             stderr=subprocess.DEVNULL,
         )
 
+    def _filter_data(self, data: dict[str, Any], max_history: int) -> set[str]:
+        items = set(data["data"])
+
+        ignore = not self.option("ignore")
+
+        if max_history != -1:
+            history = data["history"]
+            if len(history) >= len(data) - self.option("total"):
+                data["history"] = []
+                self.line("History too long. Clearing...", style="warning")
+            else:
+                items -= items.intersection(set(history))
+
+        if ignore:
+            items -= items.intersection(set(data["ignore"]))
+
+        return items
+
     def item_selection(self, data: dict, cache_path: Path) -> dict[str, Any]:
         """Selection function where the user chooses a repository.
 
@@ -176,21 +194,8 @@ class BaseCommand(Command):
             dict: A dictionary with all the data to be cached to the JSON file.
         """
 
-        items = set(data["data"])
-
         max_history = self.option("max_history")
-        ignore = not self.option("ignore")
-
-        # TODO: Need a way of avoiding keeping enough items in the history.
-        if max_history != -1:
-            history = data["history"]
-            if len(history) >= len(data) - self.option("total"):
-                data["history"] = []
-            else:
-                items -= items.intersection(set(history))
-
-        if ignore:
-            items -= items.intersection(set(data["ignore"]))
+        items = self._filter_data(data, max_history)
 
         selected_item, selection = self.user_selection(items)
 
