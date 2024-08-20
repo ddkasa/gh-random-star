@@ -172,11 +172,11 @@ class BaseCommand(Command):
 
         if max_history != -1:
             history = data["history"]
-            if len(history) >= len(data) - self.option("total"):
-                data["history"] = []
-                self.line("History too long. Clearing...", style="warning")
-            else:
+            if len(items) - len(history) >= self.option("total"):
                 items -= items.intersection(set(history))
+            else:
+                data["history"] = []
+                self.line("History too long. Clearing...", style="comment")
 
         if ignore:
             items -= items.intersection(set(data["ignore"]))

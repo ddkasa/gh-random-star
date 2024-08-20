@@ -70,14 +70,18 @@ def test_filter_data(capsys, monkeypatch):
             "ddkasa/Aoe4bot",
         ],
         "ignore": [],
-        "history": ["wadawd", "awdawd", "wadwadaw"],
+        "history": [
+            "ddkasa/gh-random-star",
+            "ddkasa/ulauncher-toggl-extension",
+            "ddkasa/Aoe4bot",
+        ],
     }
 
     cmd._filter_data(data, 3)
 
     out, err = capsys.readouterr()
 
-    assert "History too long. Clearing.." in out
+    assert "History too long. Clearing..." in out
     assert err == ""
     assert len(data["history"]) == 0
 
