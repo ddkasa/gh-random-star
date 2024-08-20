@@ -10,8 +10,8 @@ from github_random_star.version import __version__
 from .utility import setup_logging
 
 
-def run(args=None):
-    setup_logging(logging.DEBUG)
+def run(args=None) -> int:
+    setup_logging(logging.INFO)
     app = Application(
         name="Github Random Star",
         version=__version__,
