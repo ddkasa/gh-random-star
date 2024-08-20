@@ -21,7 +21,7 @@ pipx install github-random-star
 #### Install with [GitHub CLI](https://github.com/cli/cli).
 
 ```
-gh extension install ddkasa/github-random-star
+gh extension install ddkasa/gh-random-star
 ```
 
 ## Usage
