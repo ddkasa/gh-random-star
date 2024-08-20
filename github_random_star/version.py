@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
 
 
 class VersionNo(NamedTuple):
