@@ -1,20 +1,21 @@
 from __future__ import annotations
 
-from typing import NamedTuple
+from dataclasses import dataclass, field
 
 __version__ = "1.1.2"
 
 
-class VersionNo(NamedTuple):
-    major: int
-    minor: int
-    patch: int
+@dataclass(frozen=True)
+class Version:
+    major: int = field()
+    minor: int = field()
+    patch: int = field()
 
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}.{self.patch}"
 
     def __gt__(self, other: object) -> bool:
-        if not isinstance(other, VersionNo):
+        if not isinstance(other, Version):
             return False
         if self == other:
             return False
@@ -32,7 +33,7 @@ class VersionNo(NamedTuple):
 
     def __eq__(self, other: object) -> bool:
         return (
-            isinstance(other, VersionNo)
+            isinstance(other, Version)
             and self.major == other.major
             and self.minor == other.minor
             and self.patch == other.patch
@@ -41,7 +42,7 @@ class VersionNo(NamedTuple):
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
-    @staticmethod
-    def process_version(version: str) -> VersionNo:
+    @classmethod
+    def process_version(cls, version: str) -> Version:
         major, minor, patch = version.split(".")
-        return VersionNo(int(major), int(minor), int(patch))
+        return Version(int(major), int(minor), int(patch))
