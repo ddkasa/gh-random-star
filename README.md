@@ -1,8 +1,8 @@
 # ⭐️ GitHub Random Star ⭐️
 
 <a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/v/github_random_star?style=for-the-badge&logo=pypi" /></a>
-<a href=""><img src="https://img.shields.io/github/actions/workflow/status/ddkasa/github-random-star/pypi-publish.yml?style=for-the-badge"/></a>
-<a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/dm/github-random-star?style=for-the-badge" /></a>
+<a href="https://github.com/ddkasa/gh-random-star/actions/workflows/pypi-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/ddkasa/github-random-star/pypi-publish.yml?style=for-the-badge"/></a>
+<a href="https://pypistats.org/packages/github-random-star"><img src="https://img.shields.io/pypi/dm/github-random-star?style=for-the-badge" /></a>
 
 ![](docs/example_image.png?raw=true)
 
