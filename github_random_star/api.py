@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 import random
+import time
 from typing import Any, Final, Optional
 
 from httpx import Client, codes
@@ -131,6 +132,7 @@ class GithubAPI(ABC):
                     response.text,
                     seconds,
                 )
+                time.sleep(seconds)
                 return self.request(url, retry=False)
 
             if (
