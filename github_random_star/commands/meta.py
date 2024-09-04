@@ -81,8 +81,12 @@ class BaseCommand(Command):
         repositories = github_api.collect_items()
 
         self.line(
-            f"Total amount of repositories: {len(repositories["data"])}",
+            f"Total amount of repositories: {len(repositories['data'])}",
             style="info",
+        )
+        self.line(
+            f"Ignored repositories: {len(repositories['ignore'])}",
+            verbosity=Verbosity.VERBOSE,
         )
 
         data = self.item_selection(repositories, cache_path)
