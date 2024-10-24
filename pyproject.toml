@@ -7,7 +7,10 @@ readme = "README.md"
 license = "MIT"
 classifiers = [
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Utilities",
     "License :: OSI Approved :: MIT License",
     "Development Status :: 5 - Production/Stable",
@@ -32,7 +35,7 @@ packages = [{ include = "github_random_star" }]
 gh-star = "github_random_star.extension:run"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.10"
 httpx = "^0.26.0"
 cleo = "^2.1.0"
 
@@ -57,3 +60,42 @@ markers = [
 
 [tool.mypy]
 ignore_missing_imports = true
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = True
+envlist = ruff, mypy,  py312, py311, py310, py313
+
+[testenv]
+skip_install = true
+passenv = *
+setenv = 
+    GH_ACTION = "True"
+    TOGGL_WORKSPACE_ID = {env:TOGGL_WORKSPACE_ID}
+    TOGGL_API_TOKEN = {env:TOGGL_API_TOKEN}
+    PYTHONPATH = {toxinidir}
+
+allowlist_externals = poetry
+commands_pre = 
+    poetry install
+commands = 
+    poetry run pytest {posargs}
+
+[gh-actions]
+python = 
+    3.10: py310
+    3.11: py311
+    3.12: ruff, mypy, py312
+    3.13: py313
+
+[testenv:mypy]
+allowlist_externals = mypy, poetry
+basepython = python3.12
+commands = mypy github_random_star
+
+[testenv:ruff]
+allowlist_externals = ruff, poetry
+basepython = python3.12
+commands = ruff check github_random_star
+"""
