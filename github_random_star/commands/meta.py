@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 
 from cleo.commands.command import Command
-from cleo.helpers import option, Option, Argument, argument
+from cleo.helpers import option, argument
 from cleo.io.outputs.output import Verbosity
 
 from github_random_star.api import GithubAPI
@@ -19,13 +19,13 @@ class BaseCommand(Command):
     GH_URL: Final[str] = "https://github.com/"
     API: type[GithubAPI]
 
-    arguments: list[Argument] = [
+    arguments = [
         argument(
             "account",
             description="Account to fetch data from.",
         )
     ]
-    options: list[Option] = [
+    options = [
         option(
             "total",
             "t",
@@ -67,7 +67,7 @@ class BaseCommand(Command):
 
         return option
 
-    def handle(self) -> None:
+    def handle(self) -> int:
         """Basic entrypoint for the CLI script."""
         cache_path = generate_cache_directory()
 
@@ -94,6 +94,8 @@ class BaseCommand(Command):
         github_api.save_items(data["data"], data)
 
         self.line("Done!", style="info")
+
+        return 0
 
     @staticmethod
     def extract_selection(path: Path) -> list[str]:
