@@ -1,6 +1,7 @@
 # ⭐️ GitHub Random Star ⭐️
 
 <a href="https://pypi.org/project/github-random-star"><img src="https://img.shields.io/pypi/v/github_random_star?style=for-the-badge&logo=pypi" /></a>
+<a href="https://pypi.org/project/github-random-star"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/github-random-star?style=for-the-badge"></a>
 <a href="https://github.com/ddkasa/gh-random-star/actions/workflows/pypi-publish.yml"><img src="https://img.shields.io/github/actions/workflow/status/ddkasa/github-random-star/pypi-publish.yml?style=for-the-badge"/></a>
 <a href="https://pypistats.org/packages/github-random-star"><img src="https://img.shields.io/pypi/dm/github-random-star?style=for-the-badge" /></a>
 
@@ -69,7 +70,7 @@ gh extension install ddkasa/gh-random-star
 - `gh random-star star ddkasa`
 - `gh random-star repo ddkasa`
 
-## Development
+## Contributing
 
 Development is run through [Poetry](https://github.com/python-poetry/poetry).
 
@@ -81,11 +82,15 @@ Development is run through [Poetry](https://github.com/python-poetry/poetry).
 4. `poetry install`
 5. `poetry run gh-star`
 
+- Lint with `ruff check toggl_api`
+- Check typing with `mypy toggl_api`
+
 ### Testing
 
-- Use `pytest` for all tests.
-- Use `pytest -m unit` for unit tests.
-- Use `pytest -m integration` for integration tests.
+- Use `pytest` for all tests
+- Use `pytest -m unit` for unit tests
+- Use `pytest -m integration` for integration tests
+- Test all supported python versions through `tox`
 
 ## License
 
